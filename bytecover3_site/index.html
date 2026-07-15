@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ByteCover3 零基础学习指南</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/demos.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">ByteCover3</div>
+                <div class="sidebar-subtitle">零基础学习指南</div>
+            </div>
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>学习进度</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="nav-section">目录</div>
+            <ul class="nav-list">
+                <li class="nav-item"><a href="#intro" class="nav-link">导学</a></li>
+                <li class="nav-item"><a href="#chapter1" class="nav-link">第 1 章：理解问题</a></li>
+                <li class="nav-item"><a href="#chapter2" class="nav-link">第 2 章：音频如何变成图</a></li>
+                <li class="nav-item"><a href="#chapter3" class="nav-link">第 3 章：神经网络基础</a></li>
+                <li class="nav-item"><a href="#chapter4" class="nav-link">第 4 章：局部特征与 MaxMean</a></li>
+                <li class="nav-item"><a href="#chapter5" class="nav-link">第 5 章：Local Alignment Loss</a></li>
+                <li class="nav-item"><a href="#chapter6" class="nav-link">第 6 章：两阶段检索</a></li>
+                <li class="nav-item"><a href="#chapter7" class="nav-link">第 7 章：Demo 工程化</a></li>
+                <li class="nav-item"><a href="#chapter8" class="nav-link">第 8 章：真实案例与面试题</a></li>
+                <li class="nav-item"><a href="#summary" class="nav-link">总结与延伸</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="top-bar">
+                <button class="menu-toggle" id="menuToggle">☰ 目录</button>
+                <button class="theme-toggle" id="themeToggle">🌙 暗色模式</button>
+            </div>
+
+            <!-- Hero -->
+            <section class="hero" id="intro">
+                <span class="hero-badge">零基础友好 · 可交互</span>
+                <h1>ByteCover3 学习指南</h1>
+                <p>一步一步理解 ByteCover3：如何用十几秒的短音频片段，从海量歌曲中找到它的翻唱原曲。</p>
+                <div class="hero-actions">
+                    <a href="#chapter1" class="btn btn-primary">开始</a>
+                    <a href="#chapter8" class="btn btn-secondary">先看业务场景</a>
+                </div>
+            </section>
+
+            <!-- Roadmap -->
+            <h2>学习路线</h2>
+            <div class="roadmap">
+                <a href="#chapter1" class="roadmap-item">
+                    <div class="roadmap-number">1</div>
+                    <div class="roadmap-content">
+                        <h4>理解问题</h4>
+                        <p>翻唱识别是什么？为什么短视频场景很难？</p>
+                    </div>
+                </a>
+                <a href="#chapter2" class="roadmap-item">
+                    <div class="roadmap-number">2</div>
+                    <div class="roadmap-content">
+                        <h4>音频如何变成图</h4>
+                        <p>波形、频谱图、CQT 时频表示</p>
+                    </div>
+                </a>
+                <a href="#chapter3" class="roadmap-item">
+                    <div class="roadmap-number">3</div>
+                    <div class="roadmap-content">
+                        <h4>神经网络基础</h4>
+                        <p>CNN、ResNet、IBN 归一化</p>
+                    </div>
+                </a>
+                <a href="#chapter4" class="roadmap-item">
+                    <div class="roadmap-number">4</div>
+                    <div class="roadmap-content">
+                        <h4>局部特征与 MaxMean</h4>
+                        <p>ByteCover3 的核心思想</p>
+                    </div>
+                </a>
+                <a href="#chapter5" class="roadmap-item">
+                    <div class="roadmap-number">5</div>
+                    <div class="roadmap-content">
+                        <h4>Local Alignment Loss</h4>
+                        <p>模型是怎么学会识别翻唱的</p>
+                    </div>
+                </a>
+                <a href="#chapter6" class="roadmap-item">
+                    <div class="roadmap-number">6</div>
+                    <div class="roadmap-content">
+                        <h4>两阶段检索</h4>
+                        <p>从海量歌曲里快速找到答案</p>
+                    </div>
+                </a>
+                <a href="#chapter7" class="roadmap-item">
+                    <div class="roadmap-number">7</div>
+                    <div class="roadmap-content">
+                        <h4>Demo 工程化</h4>
+                        <p>动手写一个简化版 ByteCover3</p>
+                    </div>
+                </a>
+                <a href="#chapter8" class="roadmap-item">
+                    <div class="roadmap-number">8</div>
+                    <div class="roadmap-content">
+                        <h4>真实案例与面试题</h4>
+                        <p>业务场景 + 高频面试 Q&A</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Chapter 1 -->
+            <section id="chapter1">
+                <h2>第 1 章：理解问题</h2>
+
+                <h3>什么是翻唱识别？</h3>
+                <p>想象你手机里有一首周杰伦的《晴天》。你的朋友在 KTV 唱了一首《晴天》，或者有人用吉他弹唱了《晴天》的副歌。</p>
+                <p><strong>翻唱识别的任务就是：让电脑判断这两段音频是不是同一首歌。</strong></p>
+
+                <h4>难点在哪里？</h4>
+                <ul>
+                    <li>换了歌手（男声变女声）</li>
+                    <li>换了乐器（吉他版、钢琴版、摇滚版）</li>
+                    <li>变了调（升调或降调）</li>
+                    <li>变了速度（快一点或慢一点）</li>
+                    <li>只唱了其中一段（比如只唱副歌）</li>
+                </ul>
+
+                <h3>传统方法 vs ByteCover3</h3>
+                <div class="comparison">
+                    <div class="comparison-box">
+                        <h4>传统方法</h4>
+                        <p>把整首歌变成一个"指纹"（一个数字向量），然后比较两个指纹像不像。</p>
+                        <p>就像给一本书写一句话摘要，然后比较摘要。</p>
+                        <p><strong>问题</strong>：如果你只给我书里的一句话（短视频片段），我很难判断它属于哪本书。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>ByteCover3</h4>
+                        <p>把一首歌切成很多小段，每段都有自己的"指纹"。</p>
+                        <p>查询也是小段，就去目标歌曲里一段一段找最像的部分。</p>
+                        <p><strong>优势</strong>：只关心最匹配的局部片段，忽略不相关部分。</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>一句话总结</strong>：ByteCover3 解决的问题是——你只有一首歌的十几秒片段，它甚至可能是翻唱的，怎么从海量完整歌曲里找到它的原曲？</p>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>翻唱识别：判断两段音频是不是同一首歌的不同版本</li>
+                        <li>音频指纹：把音频变成一串数字，相似的音频数字也相似</li>
+                        <li>全局特征：用一串数字代表整首歌</li>
+                        <li>局部特征：用很多串数字代表歌的不同片段</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter1"></div>
+            </section>
+
+            <!-- Chapter 2 -->
+            <section id="chapter2">
+                <h2>第 2 章：音频如何变成图</h2>
+
+                <h3>2.1 声音的本质：波形</h3>
+                <p>声音是一种波。你对着麦克风说话时，麦克风里的振膜会随声音振动，产生一个随时间变化的电压信号。</p>
+                <p>如果我们把这个电压画出来，就是一条<strong>波形</strong>：</p>
+                <ul>
+                    <li><strong>振幅</strong>（上下高度）：表示声音的大小</li>
+                    <li><strong>频率</strong>（波浪的疏密）：表示音调的高低</li>
+                </ul>
+
+                <h4>直接看波形的问题</h4>
+                <p>波形包含了所有信息，但对 AI 来说很难直接用：</p>
+                <ol>
+                    <li><strong>信息太密</strong>：一秒钟的音频就有 22050 个采样点</li>
+                    <li><strong>看不出音高</strong>：波形是一团混合波，很难直接看出"这是 do、re、mi 中的哪个"</li>
+                    <li><strong>不同速度很乱</strong>：同一首歌快放和慢放，波形完全不同</li>
+                </ol>
+
+                <h3>2.2 频谱图：看每个时刻有哪些频率</h3>
+                <p>想象钢琴键盘：低音在左边，高音在右边。</p>
+                <p><strong>频谱图</strong>就是把音频在每一小段时间内，拆成不同频率的强度，然后画成一张图：</p>
+                <ul>
+                    <li><strong>横轴</strong>：时间</li>
+                    <li><strong>纵轴</strong>：频率（音高）</li>
+                    <li><strong>颜色深浅</strong>：该频率在当前时刻有多强</li>
+                </ul>
+                <p>这样一张图就像乐谱的可视化：亮的地方 = 那个时刻某个音很响。</p>
+
+                <h3>2.3 CQT：论文用的特殊频谱图</h3>
+                <p>论文用的是 <strong>CQT（Constant-Q Transform，常数 Q 变换）</strong>。</p>
+                <p>它和普通频谱图的区别在于：普通频谱图的频率轴是均匀分布的（每 10Hz 一格），而 <strong>CQT 的频率轴是对数分布的，低频分得很细，高频分得很粗</strong>。</p>
+
+                <h4>为什么 CQT 更适合音乐？</h4>
+                <p>因为人的听觉和音乐本身就是对数的：</p>
+                <ul>
+                    <li>100Hz 和 200Hz 差一个八度</li>
+                    <li>1000Hz 和 2000Hz 也差一个八度</li>
+                    <li>但普通频谱图会把 100-200Hz 和 1000-2000Hz 画得一样宽</li>
+                </ul>
+                <p>CQT 让低音区的细节更丰富，每个 bin 对应一个半音，更适合音乐分析。</p>
+
+                <h3>2.4 ByteCover3 里的具体设置</h3>
+                <div class="process-flow">
+                    <span class="process-step">原始音频</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">重采样 22050 Hz</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">切 20s chunks</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">CQT</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">时间下采样 100 倍</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">输入神经网络</span>
+                </div>
+
+                <table>
+                    <tr>
+                        <th>步骤</th>
+                        <th>配置</th>
+                    </tr>
+                    <tr>
+                        <td>采样率</td>
+                        <td>22050 Hz</td>
+                    </tr>
+                    <tr>
+                        <td>分块</td>
+                        <td>20 秒一段，相邻重叠 10 秒</td>
+                    </tr>
+                    <tr>
+                        <td>时频表示</td>
+                        <td>CQT，每八度 12 bins，hop size 512，Hann 窗</td>
+                    </tr>
+                    <tr>
+                        <td>时间下采样</td>
+                        <td>沿时间轴 average pooling，降采样 100 倍</td>
+                    </tr>
+                </table>
+
+                <h4><strong>分块：20 秒一段，相邻重叠 10 秒</strong></h4>
+                <p>ByteCover3 把一首歌切成很多 20 秒的片段。但为什么不直接首尾相接，而是要让相邻片段重叠 10 秒呢？</p>
+
+                <h4>为什么需要重叠？</h4>
+                <p>重叠是为了<strong>不让音乐信息在 chunk 边界处被切断</strong>。</p>
+                <p>如果完全不重叠：</p>
+                <pre><code>[0-20s] [20-40s] [40-60s]</code></pre>
+                <p>可能会出现这些问题：</p>
+                <ul>
+                    <li>某个和弦转换正好发生在 20 秒处</li>
+                    <li>一段副歌旋律正好从 19 秒跨到 22 秒</li>
+                    <li>这些内容会被切到两个 chunk 里，每个 chunk 都不完整</li>
+                </ul>
+
+                <p>重叠 10 秒后：</p>
+                <pre><code>[0-20s]
+   [10-30s]
+      [20-40s]</code></pre>
+                <p>任何发生在边界附近的内容，都至少会完整地出现在某一个 chunk 中。</p>
+
+                <h4>为什么是重叠 10 秒？</h4>
+                <p>10 秒 = 20 秒 chunk 的一半，也就是 50% 重叠。这是<strong>覆盖率</strong>和<strong>数据量</strong>的折中：</p>
+                <table>
+                    <tr>
+                        <th>重叠方式</th>
+                        <th>优点</th>
+                        <th>缺点</th>
+                    </tr>
+                    <tr>
+                        <td>不重叠</td>
+                        <td>数据量最小</td>
+                        <td>边界信息容易丢失</td>
+                    </tr>
+                    <tr>
+                        <td>重叠 10 秒（50%）</td>
+                        <td>边界完整覆盖，数据量只增加一倍</td>
+                        <td>数据量适中</td>
+                    </tr>
+                    <tr>
+                        <td>重叠 15 秒（75%）</td>
+                        <td>覆盖更冗余</td>
+                        <td>数据量更大，计算更慢</td>
+                    </tr>
+                </table>
+                <p>ByteCover3 选择 50% 重叠，是音频分块中很常见且实用的选择。</p>
+
+                <h4><strong>Hop size 512 是什么意思？</strong></h4>
+                <p>CQT 是<strong>逐帧计算</strong>的，但不是对每一个采样点都算一帧，而是每隔一段距离算一帧。</p>
+                <p><strong>Hop size = 512</strong> 表示：每算完一帧，窗口就向前移动 512 个采样点，再算下一帧。</p>
+                <pre><code>采样率 22050 Hz，hop size 512
+每帧间隔 = 512 / 22050 ≈ 0.023 秒 ≈ 23 毫秒
+1 秒钟 ≈ 43 帧</code></pre>
+                <p>Hop size 越小，时间分辨率越高，但计算量也越大；hop size 越大，数据量越小，但会丢失一些时间细节。512 是一个常用的折中选择。</p>
+
+                <h4><strong>Hann 窗是什么意思？</strong></h4>
+                <p>计算 CQT 时，我们要取一小段音频做变换。如果直接截断，两端会突然从"有声音"变成"没声音"，变换时会产生虚假的频率成分，这叫<strong>频谱泄漏</strong>。</p>
+
+                <p><strong>一个具体例子</strong>：假设你吹了一口纯正 1000 Hz 的哨音（单一频率）。如果你截取的那一小段刚好在波形最高点被切断，FFT 会看到"这里好像突然从有信号变成没信号"，于是除了 1000 Hz 之外，还会多出一堆本来不存在的频率成分，比如 990 Hz、1010 Hz 附近的"假峰"。这些假峰会污染 CQT，让后续匹配变难。</p>
+
+                <p><strong>Hann 窗</strong>就是给这一小段音频两端加一个"圆润的轮廓"，让开头慢慢变强、结尾慢慢变弱，从根本上消除这种"突然截断"：</p>
+
+                <figure class="hann-window-figure">
+                    <svg viewBox="0 0 420 270" preserveAspectRatio="xMidYMid meet" aria-label="Hann 窗示意图：直接截断 vs 加窗后">
+                        <text x="20" y="22" font-size="13" font-weight="600" fill="var(--text-primary)">1. 直接截断</text>
+                        <text x="330" y="22" font-size="11" fill="var(--coral)">两端突变 → 频谱泄漏</text>
+                        <line x1="20" y1="80" x2="400" y2="80" stroke="var(--border)" stroke-width="1"/>
+                        <rect x="20" y="40" width="380" height="80" fill="none" stroke="var(--coral)" stroke-width="2" stroke-dasharray="4 4"/>
+                        <path d="M20,80 L39,58.1 L58,47.0 L77,45.8 L96,54.8 L115,70.8 L134,88.3 L153,101.1 L172,104.9 L191,98.2 L210,83.4 L229,65.6 L248,51.2 L267,45.0 L286,49.4 L305,62.6 L324,80.2 L343,96.0 L362,104.3 L381,102.6 L400,91.1" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+                        <text x="20" y="118" font-size="13" font-weight="600" fill="var(--text-primary)">2. Hann 窗</text>
+                        <line x1="20" y1="170" x2="400" y2="170" stroke="var(--border)" stroke-width="1"/>
+                        <path d="M20,165 L39,164.1 L58,161.7 L77,157.8 L96,152.9 L115,147.5 L134,142.1 L153,137.2 L172,133.3 L191,130.9 L210,130 L229,130.9 L248,133.3 L267,137.2 L286,142.1 L305,147.5 L324,152.9 L343,157.8 L362,161.7 L381,164.1 L400,165" fill="none" stroke="var(--warning)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+                        <text x="20" y="208" font-size="13" font-weight="600" fill="var(--text-primary)">3. 乘积 = 平滑后的信号</text>
+                        <text x="310" y="208" font-size="11" fill="var(--success)">两端慢慢降到 0</text>
+                        <line x1="20" y1="260" x2="400" y2="260" stroke="var(--border)" stroke-width="1"/>
+                        <path d="M20,255 L39,254.6 L58,252.3 L77,249.0 L96,248.0 L115,252.9 L134,263.7 L153,275.8 L172,282.0 L191,277.6 L210,263.4 L229,245.9 L248,233.5 L267,231.2 L286,238.2 L305,248.8 L324,256.8 L343,259.3 L362,257.8 L381,255.7 L400,255" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <figcaption>直接截断时，信号边缘会突然降到 0；Hann 窗让边缘慢慢淡出，避免引入虚假频率。</figcaption>
+                </figure>
+
+                <p>这样变换时就不会看到"突变"，频谱图更干净、更准确。</p>
+
+                <h4><strong>重采样 22050 Hz 是什么意思？</strong></h4>
+                <p>原始音频的采样率可能各不相同：CD 是 44100 Hz，视频音轨可能是 48000 Hz。<strong>重采样</strong>就是把它们统一转换成同一个采样率。</p>
+                <ul>
+                    <li><strong>22050 Hz 表示每秒有 22050 个采样点</strong></li>
+                    <li>根据奈奎斯特定理，采样率的一半就是能表示的最高频率，所以 22050 Hz 可以覆盖到 11025 Hz</li>
+                    <li>对人声和大多数乐器来说，这个频率范围已经足够</li>
+                    <li>数据量只有 44100 Hz 的一半，计算更快、存储更小</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p><strong>简单记</strong>：22050 Hz 是一个"够用且省资源"的选择。它覆盖了音乐中最重要的频率范围，同时不会让数据太大。</p>
+                </div>
+
+                <h4><strong>时间下采样 100 倍是什么意思？</strong></h4>
+                <p>CQT 是逐帧计算的。假设 hop size = 512，采样率 22050 Hz：</p>
+                <ul>
+                    <li>每帧间隔 ≈ 512 / 22050 ≈ 0.023 秒，约 23 毫秒</li>
+                    <li>1 秒钟 ≈ 43 帧</li>
+                    <li>一首 4 分钟的歌 ≈ 10000 多帧</li>
+                </ul>
+
+                <p><strong>时间下采样 100 倍</strong>，就是把连续的 100 帧合并成 1 帧，通常取平均值：</p>
+
+                <pre><code>原来：[帧1][帧2][帧3]...[帧100][帧101]...[帧200]
+合并：[平均1-100]        [平均101-200]</code></pre>
+
+                <p><strong>结果</strong>：数据量变成原来的 1/100，但主要的时频结构仍然保留。</p>
+
+                <h4>为什么要下采样？</h4>
+                <table>
+                    <tr>
+                        <th>方面</th>
+                        <th>不下采样</th>
+                        <th>下采样 100 倍</th>
+                    </tr>
+                    <tr>
+                        <td>数据量</td>
+                        <td>一首歌 10000+ 帧</td>
+                        <td>一首歌 100+ 帧</td>
+                    </tr>
+                    <tr>
+                        <td>计算量</td>
+                        <td>神经网络处理很慢</td>
+                        <td>神经网络处理更快</td>
+                    </tr>
+                    <tr>
+                        <td>保留信息</td>
+                        <td>时间细节很丰富</td>
+                        <td>保留主要时频结构，细节适度压缩</td>
+                    </tr>
+                </table>
+
+                <h3>2.5 一个真实的 CQT 例子</h3>
+                <p>下面是一个 2 秒钟的旋律 <strong>C4 → E4 → G4 → C5</strong>（do → mi → sol → 高音 do）的三种表示：</p>
+
+                <div class="figure">
+                    <img src="images/cqt_demo.png" alt="CQT Demo">
+                    <div class="figure-caption">
+                        从上到下：波形、线性频谱图、CQT。CQT 的纵轴直接对应音符（C1-C7），每个 bin 对应一个半音。
+                    </div>
+                </div>
+
+                <h4>从图里能看到什么？</h4>
+                <ul>
+                    <li><strong>波形</strong>：4 个鼓包，每个对应一个音符</li>
+                    <li><strong>线性频谱图</strong>：每个音符有平行的亮线（基频 + 泛音），但都挤在底部</li>
+                    <li><strong>CQT</strong>：4 个音符从左下到右上"爬楼梯"，每个音符对应清晰的音名位置</li>
+                </ul>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🎹 钢琴 → CQT</div>
+                        <span class="demo-badge">可交互</span>
+                    </div>
+                    <div class="demo-description">点击钢琴键，听听声音，看看它对应 CQT 的哪些 bin。注意基频和泛音的位置。</div>
+                    <div id="piano-cqt-demo"></div>
+                </div>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">📊 CQT 可视化器</div>
+                        <span class="demo-badge">可交互</span>
+                    </div>
+                    <div class="demo-description">选择一个预设旋律，浏览器会合成音频并实时绘制波形、线性频谱和简化 CQT。</div>
+                    <div id="cqt-visualizer-demo"></div>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>声音可以画成波形，波的高低是响度，疏密是音调</li>
+                        <li>频谱图横轴是时间，纵轴是频率，颜色表示强度</li>
+                        <li>CQT 是一种特别适合音乐的频谱图，低频分得更细，纵轴对应音符</li>
+                        <li>分块重叠 10 秒是为了避免音乐信息在 chunk 边界处被切断</li>
+                        <li>重采样 22050 Hz 是把音频统一成每秒 22050 个采样点，覆盖足够频率且节省计算</li>
+                        <li>Hop size 512 表示每帧之间移动 512 个采样点，约 23 毫秒</li>
+                        <li>Hann 窗让音频片段两端平滑过渡，减少频谱泄漏</li>
+                        <li>时间下采样 100 倍是把连续 100 帧合并成 1 帧，减少数据量同时保留主要结构</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter2"></div>
+            </section>
+
+            <!-- Chapter 3 -->
+            <section id="chapter3">
+                <h2>第 3 章：神经网络基础</h2>
+
+                <h3>3.1 神经网络是什么？</h3>
+                <p>神经网络可以理解为一个<strong>超级复杂的函数</strong>：</p>
+                <pre><code>输入 → [很多层计算] → 输出</code></pre>
+                <p>比如输入一张猫的图片，输出"这是猫的概率 99%"。它里面有很多"神经元"，每个神经元做很简单的计算：把输入加权求和，再经过一个非线性变换。</p>
+                <p>训练的过程就是：给网络看成千上万张图，告诉它正确答案，让它不断调整内部参数，最后学会识别。</p>
+
+                <div class="highlight-box">
+                    <p><strong>对 ByteCover3 来说</strong>：输入是 CQT 图，输出是这段音频的 embedding（特征向量）。</p>
+                </div>
+
+                <h3>3.2 CNN：专门看图的神经网络</h3>
+                <p>普通神经网络把图片拉平成一列数字，但这样会丢失空间关系。比如一个音符的亮斑是一片区域，不是单独一个点。</p>
+                <p><strong>CNN（卷积神经网络）</strong>的想法是：用一个小窗口在图上滑动，局部地看图。</p>
+
+                <h4>卷积是什么？</h4>
+                <p>想象你有一个 3×3 的小滤镜（卷积核），你把它放在图片左上角，计算这 9 个格子的加权平均，得到一个数字。然后向右移一格，再算。一行算完，再往下移一格。</p>
+                <p>不同的滤镜可以检测不同的东西：竖直边缘、横线、特定纹理。</p>
+
+                <h4>多层卷积</h4>
+                <p>CNN 通常有很多层：</p>
+                <ul>
+                    <li>第 1 层：检测简单边缘、点</li>
+                    <li>第 2 层：检测简单形状（横线、竖线、角）</li>
+                    <li>第 3 层：检测更复杂的图案</li>
+                    <li>...</li>
+                    <li>第 N 层：检测高级概念（比如"这是 C 和弦"、"这是鼓点"）</li>
+                </ul>
+
+                <h4>为什么不同层能检测不同复杂度的特征？</h4>
+                <p>核心是两个效应叠加：<strong>感受野越来越大</strong>，以及<strong>简单特征组合成复杂特征</strong>。</p>
+
+                <p><strong>1. 感受野越来越大</strong></p>
+
+                <div class="concept-box">
+                    <p><strong>感受野（Receptive Field）</strong>就是一个神经元能「看到」的输入区域大小，也就是它的「视野范围」。</p>
+                    <ul>
+                        <li>第 1 层 3×3 卷积：每个神经元看原图 <strong>3×3</strong> 的区域</li>
+                        <li>第 2 层 3×3 卷积：看第 1 层输出的 3×3，但第 1 层每个点已覆盖原图 3×3，所以实际看原图约 <strong>5×5</strong></li>
+                        <li>第 3 层 3×3 卷积：感受野继续扩大到约 <strong>7×7</strong></li>
+                    </ul>
+                    <p>就像戴望远镜：浅层是低倍数，只看细节；深层是高倍数，越看越大。</p>
+                </div>
+
+                <p><strong>为什么第 1 层每个点能覆盖原图 3×3？</strong></p>
+                <p>因为第 1 层本身就是用 3×3 卷积核在原图上滑出来的。<strong>第 1 层的一个输出值，等于原图某个 3×3 小区域的加权平均</strong>，而不是原图的一个点。</p>
+
+                <p>具体看下面这个例子：</p>
+
+                <div class="two-column-example">
+                    <div>
+                        <p><strong>原图（5×5）</strong></p>
+                        <pre><code>A B C D E
+F G H I J
+K L M N O
+P Q R S T
+U V W X Y</code></pre>
+                    </div>
+                    <div>
+                        <p><strong>第 1 层输出（3×3）</strong></p>
+                        <pre><code>P Q R
+S T U
+V W X</code></pre>
+                    </div>
+                </div>
+
+                <ul>
+                    <li>P 来自原图左上角 3×3：A,B,C,F,G,H,K,L,M</li>
+                    <li>R 来自原图右上角 3×3：C,D,E,H,I,J,M,N,O</li>
+                    <li>X 来自原图右下角 3×3：M,N,O,R,S,T,W,X,Y</li>
+                </ul>
+
+                <p>所以第 2 层看第 1 层的 3×3（P,Q,R,S,T,U,V,W,X），其实就是把原图 9 个相邻的 3×3 区域拼起来，正好覆盖约 <strong>5×5</strong> 的原图。</p>
+
+                <p>第 1 层的每个神经元只看原图一个 3×3 的小格子，所以只能发现「这里有一条竖边」或者「这个频率 bin 突然变亮」。</p>
+                <p>第 2 层虽然也是 3×3 卷积，但它看的是第 1 层的输出；而第 1 层的每个点已经覆盖了原图的 3×3，所以第 2 层实际上能看到原图约 5×5 的区域。</p>
+                <p>层数越深，每个神经元能「看到」的原图范围就越大，自然就能发现更大的结构。</p>
+
+                <p><strong>2. 特征层层组合</strong></p>
+                <p>第 1 层学到的是「横线」「竖线」「亮点」这类最基础的特征。</p>
+                <p>第 2 层可以把第 1 层的输出组合起来：横线 + 竖线 →「角」；两条竖线 →「两条平行线」。</p>
+                <p>第 3 层再把「角」「平行线」组合成「三角形」「方块」等更复杂的图案。</p>
+                <p>到了深层，网络就能组合出「这是 C 和弦」「这是副歌开头」「这是一段鼓点」这种高级概念。</p>
+
+                <h4>每一层学到什么是自己决定的，还是人规定的？</h4>
+                <p><strong>不是人指定的，是网络自己从数据里学出来的。</strong>但为什么它恰好学出「简单 → 复杂」这种层次？主要有三个原因：</p>
+
+                <p><strong>1. 架构逼着它先学局部</strong></p>
+                <p>第 1 层只能看 3×3 的小区域，它想学「整段副歌」也学不了，因为根本看不到那么大的范围。所以它只能先学最基础、最局部的模式：边缘、点、小纹理。</p>
+
+                <p><strong>2. 复杂的东西本来就是简单东西拼起来的</strong></p>
+                <p>一个旋律乐句可以拆成很多音符；一个和弦可以拆成几个同时响的音；一座房子可以拆成墙、窗、门。网络发现：与其每一层都从零开始学复杂图案，不如先学小零件，再组合。这样参数更少、效果更好。</p>
+
+                <p><strong>3. 任务在引导它</strong></p>
+                <p>ByteCover3 的任务是判断两段音频是不是同一首歌。训练时，如果网络学的特征对「识别同一首歌」没用，损失就会高，梯度下降会逼着它调整。久而久之，网络就学会了那些对「翻唱不变、歌曲可区分」有用的特征：旋律、和弦、节奏型，而不是音色、歌手嗓音。</p>
+
+                <div class="highlight-box">
+                    <p><strong>一句话总结</strong>：不是「我们规定第 3 层必须学和弦」，而是「数据和任务让第 3 层发现：学和弦对完成翻唱识别任务最有帮助」。</p>
+                </div>
+
+                <p><strong>对 ByteCover3 的 CQT 图来说</strong>，这种层次大致对应：</p>
+                <ul>
+                    <li><strong>浅层</strong>：某个频率 bin 突然变强（单个音符）</li>
+                    <li><strong>中层</strong>：一小段旋律走向或简单和弦</li>
+                    <li><strong>深层</strong>：乐句、节奏型、歌曲段落</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p><strong>一句话总结</strong>：CNN 的浅层像显微镜看细节，深层像广角镜头看大局；而且深层会把浅层发现的小零件组装成复杂结构。</p>
+                </div>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🔍 CNN 卷积动画</div>
+                        <span class="demo-badge">动画</span>
+                    </div>
+                    <div class="demo-description">看一个 3×3 的卷积核如何在 CQT 图上滑动，逐像素生成特征图。</div>
+                    <div id="cnn-animation-demo"></div>
+                </div>
+
+                <h3>3.3 ResNet：让神经网络可以很深</h3>
+                <p>直觉上，网络层数越多，能力越强。但实际情况是：当网络超过一定深度后，训练效果反而变差。信息在层层传递中容易"丢失"或"退化"。</p>
+                <p><strong>ResNet 的解决办法：shortcut（ shortcut）</strong>。</p>
+                <pre><code>普通网络： 输入 → [层1] → [层2] → [层3] → 输出
+
+ResNet：   输入 ───────────────┐
+              ↓                ↓
+            [层1] → [层2] → [层3] → 输出
+              ↑_________________|
+                   （跳过去）</code></pre>
+                <p>也就是：<code>输出 = 层3(层2(层1(输入))) + 输入</code></p>
+                <p>这个"+ 输入"就是残差连接。如果某层学不到东西，它至少可以把输入原封不动传下去，不会变得更差。</p>
+                <p>ByteCover3 用的是 <strong>ResNet-50</strong>，就是有 50 层的 ResNet。</p>
+
+                <h3>3.4 IBN：Instance-Batch Normalization</h3>
+                <p>这是 ByteCover1 引入的，ByteCover3 沿用了。</p>
+
+                <h4>先理解 Normalization（归一化）</h4>
+                <p>神经网络训练时，数据分布会变化，导致训练困难。Normalization 就是把数据调整到合适的范围，让训练更稳定。</p>
+                <ul>
+                    <li><strong>Batch Normalization（BN）</strong>：对一个 batch 内的数据做标准化，保留内容信息</li>
+                    <li><strong>Instance Normalization（IN）</strong>：对每个样本单独做归一化，能去掉"风格"信息</li>
+                </ul>
+
+                <h4>IBN 块</h4>
+                <p>IBN 把 BN 和 IN 结合起来：一部分走 BN，一部分走 IN，然后合并。</p>
+                <p><strong>为什么对翻唱识别有用？</strong></p>
+                <p>翻唱版本之间差异很大：不同歌手、不同乐器、不同调、不同速度。IN 帮助网络忽略这些"风格"变化，BN 帮助网络保留"它是哪首歌"这个内容信息。</p>
+
+                <h3>3.5 ByteCover3 的网络结构</h3>
+                <div class="process-flow">
+                    <span class="process-step">CQT 图</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">ResNet-IBN 50</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">高维特征图 Z</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">GeM Pooling</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">PCA-FC 降维</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">局部 embedding</span>
+                </div>
+
+                <h4>高维特征图 Z ∈ R^(C×H×W)</h4>
+                <p>经过 ResNet-IBN 后，原来的 CQT 图被转换成另一张"图"：</p>
+                <ul>
+                    <li><strong>C = 2048</strong>：通道数，每个通道是一种"高级特征检测器"</li>
+                    <li><strong>H = 6</strong>：高度（压缩后的频率方向）</li>
+                    <li><strong>W = T/s</strong>：宽度（压缩后的时间方向）</li>
+                </ul>
+                <p>你可以把输出想象成 2048 张"小图"叠在一起，每张图代表一种高级特征。</p>
+
+                <h4>GeM Pooling（广义均值池化）</h4>
+                <p>ResNet-IBN 输出的是 <code>C × H × W</code> 的三维特征图，但我们需要一个固定长度的向量来表示这个 20 秒片段。所以要做一步<strong>池化（Pooling）</strong>：把 H×W 的空间信息压缩掉，只保留 C 个通道的数值。</p>
+
+                <p>最自然的想法有两种：</p>
+                <ul>
+                    <li><strong>平均池化（Average Pooling）</strong>：把 H×W 所有位置求平均。好处是考虑全局，坏处是容易把重要的局部信息稀释掉。</li>
+                    <li><strong>最大池化（Max Pooling）</strong>：只取每个通道的最大值。好处是突出最显著的特征，坏处是完全忽略其他位置。</li>
+                </ul>
+
+                <p><strong>GeM Pooling 在两者之间取一个可学习的平衡</strong>：</p>
+                <ul>
+                    <li>当 p=1 时，GeM = Average Pooling</li>
+                    <li>当 p→∞ 时，GeM = Max Pooling</li>
+                    <li>p 是一个可学习的参数，网络自己决定应该多像平均、多像最大</li>
+                </ul>
+
+                <p><strong>为什么 ByteCover3 要用 GeM？</strong> 因为对翻唱识别来说，一段 20 秒音频里不是所有时刻都同样重要。比如某个特征性旋律出现的时刻、鼓点进入的瞬间，可能比静音或平淡伴奏更关键。GeM 让网络自动学会：哪些位置值得重点关注，哪些可以平滑带过，而不是人工决定用平均还是最大。</p>
+
+                <div class="highlight-box">
+                    <p><strong>一句话总结</strong>：GeM Pooling 把三维特征图压缩成一维向量，同时让网络自己决定「应该多关注最显著的位置，还是应该兼顾全局」。</p>
+                </div>
+
+                <h4>PCA-FC 降维</h4>
+                <p>现在我们有 2048 维的向量，维度太高。PCA-FC 把它降到 512 维：</p>
+                <ul>
+                    <li>先用 PCA 计算一个投影矩阵</li>
+                    <li>用这个矩阵初始化全连接层</li>
+                    <li>然后在训练中继续微调</li>
+                </ul>
+                <p>最终一首歌变成 <strong>N 个 512 维向量</strong>，每个向量代表 20 秒片段的特征。</p>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>CNN 是用小窗口扫描图片，学习从简单到复杂的特征</li>
+                        <li>ResNet 用 shortcut 让深层网络能训练</li>
+                        <li>IBN 结合 BN 和 IN，让模型对风格变化更鲁棒</li>
+                        <li>ByteCover3 用 ResNet-IBN 从 CQT 图里提取局部特征</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter3"></div>
+            </section>
+
+            <!-- Chapter 4 -->
+            <section id="chapter4">
+                <h2>第 4 章：局部特征与 MaxMean 相似度</h2>
+
+                <h3>4.1 为什么局部特征更好？</h3>
+                <p>先回忆全局特征的做法：</p>
+                <pre><code>整首歌 → 一个向量
+短查询 → 一个向量
+比较两个向量</code></pre>
+                <p>问题出在哪？</p>
+                <p>想象你有一本 300 页的小说，我只给你其中 3 页。要你判断这 3 页属于哪本书。</p>
+                <ul>
+                    <li><strong>全局方法</strong>：把整本书总结成一句话摘要，再把这 3 页也总结成一句话，然后比较。这不合理，因为 3 页的内容很难代表整本书的主题，300 页书里大量内容会干扰匹配。</li>
+                    <li><strong>局部方法</strong>：把整本书拆成一页一页。给你 3 页，就去所有书里一页一页找最像的。</li>
+                </ul>
+
+                <h3>4.2 MaxMean 相似度</h3>
+                <p>现在我们有：</p>
+                <ul>
+                    <li>查询音频：M 个局部特征 <code>[q_1, q_2, ..., q_M]</code></li>
+                    <li>目标歌曲：N 个局部特征 <code>[d_1, d_2, ..., d_N]</code></li>
+                </ul>
+
+                <h4>计算步骤</h4>
+                <ol>
+                    <li><strong>对每个查询 chunk，找最像的目标 chunk</strong>：
+                        <pre><code>best_i = max(similarity(q_i, d_1), similarity(q_i, d_2), ..., similarity(q_i, d_N))</code></pre>
+                    </li>
+                    <li><strong>对所有查询 chunk 取平均</strong>：
+                        <pre><code>MaxMean(查询, 目标) = (best_1 + best_2 + ... + best_M) / M</code></pre>
+                    </li>
+                </ol>
+
+                <div class="highlight-box">
+                    <p><strong>关键</strong>：只关心每个查询片段在目标里最匹配的那部分，目标里其他不相关的片段不会影响分数。</p>
+                </div>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🧮 MaxMean 计算器</div>
+                        <span class="demo-badge">可交互</span>
+                    </div>
+                    <div class="demo-description">选择 query 和 candidate 的向量分布，看 MaxMean 如何计算。注意观察"每行取 max，再求 mean"的过程。</div>
+                    <div id="maxmean-calculator-demo"></div>
+                </div>
+
+                <h3>4.3 非对称性</h3>
+                <p>MaxMean 是不对称的：总是以<strong>较短的那个</strong>作为基准。</p>
+                <p>为什么？因为场景就是<strong>短查询 vs 长完整歌曲</strong>。如果反过来以长歌曲为基准，会要求长歌曲的每个片段都能在短查询里找到匹配——这几乎不可能。</p>
+
+                <h3>4.4 余弦相似度</h3>
+                <p>ByteCover3 用<strong>余弦相似度</strong>比较两个 embedding。它计算两个向量方向的夹角：</p>
+                <ul>
+                    <li>夹角 0° → 方向完全相同 → 相似度 1</li>
+                    <li>夹角 90° → 垂直 → 相似度 0</li>
+                    <li>夹角 180° → 方向相反 → 相似度 -1</li>
+                </ul>
+                <p>只看方向，不看长度。因为 embedding 的长度可能受音量、音频质量影响，方向更能反映"是什么内容"。</p>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>局部特征为什么比全局特征更适合短查询？</li>
+                        <li>MaxMean 是怎么计算的？（先 max 再 mean）</li>
+                        <li>MaxMean 为什么是非对称的？</li>
+                        <li>余弦相似度比较的是方向还是长度？</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter4"></div>
+            </section>
+
+            <!-- Chapter 5 -->
+            <section id="chapter5">
+                <h2>第 5 章：Local Alignment Loss（LAL）</h2>
+
+                <div class="highlight-box">
+                    <p><strong>先明确一个阶段问题</strong>：损失函数只在<strong>训练阶段</strong>使用。训练完成后，模型参数固定下来，建库和检索时只用它提取 embedding、算相似度，不再计算损失。</p>
+                </div>
+
+                <p>ByteCover3 的完整流程可以分成三个阶段：</p>
+                <ol>
+                    <li><strong>训练阶段</strong>：用 LAL 训练<strong>特征提取模型</strong>，即 ResNet-IBN 50。输入音频片段的 CQT 图，输出 embedding；LAL 告诉模型「预测得对不对」，然后反向传播调整网络参数。</li>
+                    <li><strong>建库阶段</strong>：用训练好的 ResNet-IBN 把曲库歌曲切成 20 秒 chunks，提取局部 embedding 并存入索引。</li>
+                    <li><strong>检索阶段</strong>：用户上传查询音频，同样用 ResNet-IBN 提取 embedding，然后用 ANN + MaxMean 找最相似的歌曲。这一步只算相似度，不算损失。</li>
+                </ol>
+
+                <div class="concept-box">
+                    <p><strong>简单记</strong>：LAL 训练的是「音频 → embedding」的 ResNet-IBN 模型；检索时的 ANN + MaxMean 只是搜索算法，不需要训练。</p>
+                </div>
+
+                <h3>5.1 什么是损失函数？</h3>
+                <p>损失函数是模型训练的"反馈信号"：</p>
+                <ul>
+                    <li>损失越大 → 模型越错 → 需要调整</li>
+                    <li>损失越小 → 模型越对 → 保持</li>
+                </ul>
+                <p>训练神经网络就是不断做：输入数据 → 模型预测 → 计算损失 → 调整参数让损失变小。</p>
+
+                <h3>5.2 第一种损失：分类损失</h3>
+                <p>分类问题就是：给定一段音频，判断它是哪首歌。</p>
+
+                <h4>ByteCover3 的局部分类损失</h4>
+                <p>ByteCover3 不是对一个全局 embedding 做分类，而是对<strong>局部特征序列</strong>做分类。</p>
+                <p>它引入了一个概念：<strong>类别代理特征（class proxy）</strong>。对每个类别 k（每首歌），模型学一个代理特征序列 <code>W_k</code>，作为这首歌的"标准模板"。</p>
+                <p>然后对一段查询音频的局部特征 X，计算：</p>
+                <pre><code>logit_k = MaxMean(X, W_k)</code></pre>
+                <p>意思是：<strong>查询音频和每首歌的模板有多像？</strong>然后把这些分数输入 Softmax，计算分类损失。</p>
+
+                <h3>5.3 第二种损失：Triplet Loss</h3>
+                <p>Triplet = 三元组，包含三个样本：</p>
+                <ul>
+                    <li><strong>Anchor（锚点）</strong>：当前样本</li>
+                    <li><strong>Positive（正样本）</strong>：和锚点是同一首歌的另一个版本</li>
+                    <li><strong>Negative（负样本）</strong>：和锚点是不同歌的样本</li>
+                </ul>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🎵</span>例子</div>
+                    <ul>
+                        <li>Anchor：《晴天》原版片段</li>
+                        <li>Positive：《晴天》吉他翻唱片段</li>
+                        <li>Negative：《七里香》原版片段</li>
+                    </ul>
+                </div>
+
+                <h4>Triplet Loss 的目标</h4>
+                <p>我们希望 Anchor-Positive 距离小，Anchor-Negative 距离大。ByteCover3 用 MaxMean 作为距离度量：</p>
+                <pre><code>loss_triplet = max(0, MaxMean(anchor, negative) - MaxMean(anchor, positive) + margin)</code></pre>
+
+                <h3>5.4 总损失：LAL</h3>
+                <pre><code>LAL = loss_cls + loss_triplet</code></pre>
+
+                <h4>为什么要用两种损失？</h4>
+                <p>两种损失像两个老师，分别从不同的角度教模型：</p>
+
+                <table>
+                    <tr>
+                        <th>损失</th>
+                        <th>教模型什么</th>
+                        <th>比喻</th>
+                    </tr>
+                    <tr>
+                        <td>局部分类损失</td>
+                        <td>「这段音频属于哪首歌」</td>
+                        <td>老师指着图片说「这是猫，那是狗」</td>
+                    </tr>
+                    <tr>
+                        <td>局部 Triplet 损失</td>
+                        <td>「同一首歌的不同版本要像，不同歌要不像」</td>
+                        <td>老师让模型理解「这只猫和那只猫更像，而不是像狗」</td>
+                    </tr>
+                </table>
+
+                <p><strong>只用分类损失的问题</strong>：模型可能只学会「区分歌曲」，但不关心同一首歌的两个版本是否像。比如它可能把《晴天》原版和翻唱版分得远远的，只要各自能正确分类就行。</p>
+                <p><strong>只用 Triplet 损失的问题</strong>：模型可能学会相对远近，但对「具体是哪首歌」不够确定，检索时容易搞混相似的歌。</p>
+                <p><strong>两者结合</strong>，模型既知道「这是哪首歌」，又知道「同一首歌的不同版本应该靠得近」。一个负责「认歌」，一个负责「量相似度」，互相补充。</p>
+
+                <h4>为什么叫"Local Alignment"（局部对齐）？</h4>
+                <ul>
+                    <li><strong>Local</strong>：基于局部特征，不是全局特征。每段 20 秒音频被切成更小的局部片段，损失是在这些局部片段上计算的。</li>
+                    <li><strong>Alignment</strong>：训练模型学会把同一首歌的不同版本"对齐"到相近的局部特征空间里。原版、翻唱版、吉他版虽然听起来不同，但它们在特征空间里应该靠得很近。</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p><strong>一句话总结</strong>：LAL = 「局部分类损失让模型认歌」 + 「局部 Triplet 损失让模型把同歌的不同版本拉到一起」。两者共同训练出适合翻唱识别的局部特征。</p>
+                </div>
+
+                <h3>5.5 训练数据构造</h3>
+                <p>ByteCover3 的训练比较特别：</p>
+                <ol>
+                    <li>从训练曲库中随机切出 6–60 秒的短片段</li>
+                    <li>和完整曲目按 1:1 混合</li>
+                    <li>构造 triplet：anchor、positive、negative</li>
+                </ol>
+                <p>这样模型在训练时就见过"短片段 vs 完整歌"的情况，上线时才能更好地处理短视频查询。</p>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>损失函数是模型训练的"反馈信号"</li>
+                        <li>分类损失让模型学会判断"这是哪首歌"</li>
+                        <li>Triplet 损失让模型学会"同歌拉近，异歌推远"</li>
+                        <li>ByteCover3 的 LAL 是"局部分类 + 局部 Triplet"</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter5"></div>
+            </section>
+
+            <!-- Chapter 6 -->
+            <section id="chapter6">
+                <h2>第 6 章：两阶段检索</h2>
+
+                <h3>6.1 为什么需要两阶段？</h3>
+                <p>假设数据库里有 1000 万首歌，每首平均 4 分钟。ByteCover3 把每首歌切成 20 秒 chunks，每首大约有 20–30 个 chunks。</p>
+                <p>数据库里一共有：</p>
+                <pre><code>1000 万首歌 × 25 个 chunks = 2.5 亿个局部特征向量</code></pre>
+                <p>如果逐一比较，计算量太大。所以需要：</p>
+                <ol>
+                    <li><strong>第一阶段</strong>：快速筛掉大部分不可能的候选</li>
+                    <li><strong>第二阶段</strong>：对剩下的少数候选仔细计算 MaxMean</li>
+                </ol>
+
+                <h3>6.2 第一阶段：ANN 粗排</h3>
+                <p>ANN = Approximate Nearest Neighbor，近似最近邻搜索。</p>
+
+                <h4>精确搜索 vs 近似搜索</h4>
+                <ul>
+                    <li><strong>精确搜索</strong>：一个一个算距离，保证绝对最近。但 2.5 亿次对比太慢。</li>
+                    <li><strong>近似搜索</strong>：用特殊数据结构快速找出"很可能最近"的候选。速度极快，召回率很高。</li>
+                </ul>
+
+                <h4>HNSW 是什么？</h4>
+                <p>HNSW = Hierarchical Navigable Small World，层次化可导航小世界图。它建一个多层图：</p>
+                <ul>
+                    <li>顶层：稀疏连接，长距离跳跃</li>
+                    <li>中层：连接更密</li>
+                    <li>底层：最密集，精确搜索</li>
+                </ul>
+                <p>就像在城市里找一家店：先坐飞机到大城市，再坐火车到区，最后打车在街区里找。</p>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🗺️ HNSW 多层搜索动画</div>
+                        <span class="demo-badge">动画</span>
+                    </div>
+                    <div class="demo-description">看查询点如何从高层的稀疏图逐层下降，最终在底层找到最近邻。</div>
+                    <div id="hnsw-animation-demo"></div>
+                </div>
+
+                <h4>ByteCover3 的粗排过程</h4>
+                <pre><code>用户查询：15 秒 → 3 个 chunks → q_1, q_2, q_3
+
+对每个 q_i：
+    在 HNSW 索引里找 Top-50 最近邻
+    得到 50 个相似的 chunk
+
+总共：3 × 50 = 150 个候选 chunks
+来自 D 首不同的候选歌曲（D ≤ 150）</code></pre>
+
+                <h3>6.3 第二阶段：MaxMean 精排</h3>
+                <p>第一阶段筛出了 D 首候选歌曲。第二阶段对这 D 首候选歌曲，逐一计算：</p>
+                <pre><code>score_k = MaxMean(查询, 第 k 首候选歌)</code></pre>
+                <p>然后按分数排序，返回 Top 结果。</p>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🔎 两阶段检索模拟器</div>
+                        <span class="demo-badge">可交互</span>
+                    </div>
+                    <div class="demo-description">选择一个查询片段，体验 ANN 粗排和 MaxMean 精排是如何工作的。</div>
+                    <div id="retrieval-simulator-demo"></div>
+                </div>
+
+                <h3>6.4 复杂度对比</h3>
+                <table>
+                    <tr>
+                        <th>方法</th>
+                        <th>计算量</th>
+                    </tr>
+                    <tr>
+                        <td>暴力全比对</td>
+                        <td>查询 chunks × 数据库所有 chunks（巨大）</td>
+                    </tr>
+                    <tr>
+                        <td>两阶段检索</td>
+                        <td>查询 chunks × K（粗排）+ D × MaxMean（精排）（小很多）</td>
+                    </tr>
+                </table>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>为什么不能用暴力方法一首一首比对？</li>
+                        <li>ANN 是什么意思？和精确搜索的区别是什么？</li>
+                        <li>HNSW 的多层图比喻是什么？</li>
+                        <li>第一阶段找的是 chunk 还是歌曲？</li>
+                        <li>第二阶段做什么？</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter6"></div>
+            </section>
+
+            <!-- Chapter 7 -->
+            <section id="chapter7">
+                <h2>第 7 章：Demo 工程化</h2>
+
+                <h3>7.1 Demo 目标</h3>
+                <p>我们做了一个最小可运行版本，流程如下：</p>
+                <div class="process-flow">
+                    <span class="process-step">准备音频</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">提取 CQT</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">CNN 转 embedding</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">MaxMean 比较</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">两阶段检索</span>
+                </div>
+
+                <h3>7.2 简化点</h3>
+                <table>
+                    <tr>
+                        <th>论文</th>
+                        <th>Demo</th>
+                    </tr>
+                    <tr>
+                        <td>ResNet-IBN</td>
+                        <td>简单 CNN（几层卷积）</td>
+                    </tr>
+                    <tr>
+                        <td>LAL Loss 训练</td>
+                        <td>简单 Triplet Loss</td>
+                    </tr>
+                    <tr>
+                        <td>PCA-FC 降维</td>
+                        <td>简单线性层或直接取特征</td>
+                    </tr>
+                    <tr>
+                        <td>HNSW 索引</td>
+                        <td>sklearn 近似搜索</td>
+                    </tr>
+                    <tr>
+                        <td>512 维 embedding</td>
+                        <td>64 维</td>
+                    </tr>
+                </table>
+
+                <h3>7.3 Demo 结果</h3>
+                <p>我们生成了 4 首测试"歌"，每首由不同音符序列组成。然后用 3 秒查询片段做检索：</p>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">✅</span>查询 1：song1 的片段</div>
+                    <p>正确匹配 <strong>song1_do_mi_sol</strong>，相似度 0.9953</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">✅</span>查询 2：song3 的片段</div>
+                    <p>正确匹配 <strong>song3_mi_sol_si</strong>，相似度 0.9968</p>
+                </div>
+
+                <h3>7.4 代码文件说明</h3>
+                <pre><code>bytecover3_demo/
+├── audio_utils.py   # CQT 提取、分块、下采样
+├── model.py         # 简化 CNN + embedding 提取
+├── retrieval.py     # MaxMean 相似度 + 两阶段检索
+└── demo.py          # 完整流程示例</code></pre>
+
+                <p>运行命令：</p>
+                <pre><code>python3 bytecover3_demo/demo.py</code></pre>
+
+                <h3>7.5 和论文的差距</h3>
+                <p>这个 Demo 是<strong>理解原理和流程</strong>，不是<strong>复现论文精度</strong>。真实 ByteCover3 需要：</p>
+                <ul>
+                    <li>大规模真实歌曲数据集</li>
+                    <li>预训练的 ResNet-IBN 权重</li>
+                    <li>LAL Loss 完整训练</li>
+                    <li>工业级 HNSW 索引</li>
+                    <li>更大维度和更复杂的后处理</li>
+                </ul>
+
+                <div class="quiz-container" data-chapter="chapter7"></div>
+            </section>
+
+            <!-- Chapter 8 -->
+            <section id="chapter8">
+                <h2>第 8 章：真实案例与面试题</h2>
+
+                <p class="section-intro">ByteCover3 不是只在论文里好看，它在很多真实业务场景里都能派上用场。这一章我们看几个典型场景，并准备一些面试高频题。</p>
+
+                <div id="cases-container"></div>
+
+                <h3>面试高频题</h3>
+                <div id="interview-container"></div>
+
+                <div class="quiz-container" data-chapter="chapter8"></div>
+            </section>
+
+            <!-- Summary -->
+            <section id="summary">
+                <h2>总结与延伸</h2>
+
+                <h3>ByteCover3 核心创新</h3>
+                <div class="comparison comparison-3">
+                    <div class="comparison-box">
+                        <h4>1. 局部特征表示</h4>
+                        <p>把整首歌表示为多个短时局部 embedding 的序列，而不是一个全局向量。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>2. MaxMean + LAL</h4>
+                        <p>让不同长度的局部特征序列能够鲁棒地比较，专门优化短查询匹配。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>3. 两阶段检索</h4>
+                        <p>ANN 粗排 + MaxMean 精排，兼顾准确率和效率，适合工业级部署。</p>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>常见误区</strong>：ByteCover3 的网络结构里用了 GeM Pooling，但"池化"本身不是它的创新。全局平均池化是 CNN 里很常见的技术，会把整段输入压成一个全局向量；而 ByteCover3 的核心正是<strong>不用全局向量</strong>，改用局部特征序列。</p>
+                </div>
+
+                <h3>ByteCover3 完整流程</h3>
+                <div class="process-flow">
+                    <span class="process-step">原始音频</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">预处理</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">特征提取</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">训练</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">建库</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">检索</span>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">1️⃣</span>预处理阶段</div>
+                    <p>把原始音频变成模型能处理的 CQT 图。</p>
+                    <ul>
+                        <li><strong>重采样</strong>到 22050 Hz，统一采样率</li>
+                        <li><strong>CQT</strong>：把波形变成时频图，纵轴每 bin 对应一个半音</li>
+                        <li><strong>Hann 窗 + hop size 512</strong>：减少频谱泄漏，控制时间分辨率</li>
+                        <li><strong>时间下采样 100 倍</strong>：减少计算量，保留主要时频结构</li>
+                        <li><strong>切 20 秒 chunks，重叠 10 秒</strong>：得到局部片段，避免边界丢失</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">2️⃣</span>特征提取阶段</div>
+                    <p>把 CQT 图变成局部 embedding。</p>
+                    <ul>
+                        <li><strong>ResNet-IBN 50</strong>：逐层提取从简单到复杂的特征</li>
+                        <li><strong>IBN</strong>：去掉风格（歌手、乐器），保留内容（旋律、和弦）</li>
+                        <li><strong>GeM Pooling</strong>：把 3D 特征图压缩成 2048 维向量</li>
+                        <li><strong>PCA-FC</strong>：降到 512 维，得到最终局部 embedding</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">3️⃣</span>训练阶段</div>
+                    <p>用 LAL 训练 ResNet-IBN，让它学会提取适合翻唱识别的特征。</p>
+                    <ul>
+                        <li><strong>局部分类损失</strong>：让模型学会判断"这是哪首歌"</li>
+                        <li><strong>局部 Triplet 损失</strong>：让同歌不同版本靠近，不同歌远离</li>
+                        <li><strong>混合训练数据</strong>：6–60 秒短片段 + 完整曲目 1:1，模拟真实查询</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">4️⃣</span>建库阶段</div>
+                    <p>把训练好的模型应用到曲库。</p>
+                    <ul>
+                        <li>把每首歌切成 20 秒 chunks，重叠 10 秒</li>
+                        <li>用 ResNet-IBN 提取每个 chunk 的 512 维 embedding</li>
+                        <li>把所有 embedding 存入向量索引（如 HNSW）</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">5️⃣</span>检索阶段</div>
+                    <p>用户上传短音频，系统快速找到原曲。</p>
+                    <ul>
+                        <li><strong>第一阶段 ANN 粗排</strong>：快速找到少量候选 chunks</li>
+                        <li><strong>第二阶段 MaxMean 精排</strong>：对候选歌曲计算精确相似度并排序</li>
+                        <li><strong>返回 Top-K 结果</strong>：相似度最高的歌曲</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>一句话串起来</strong>：音频先变成 CQT 图，再被 ResNet-IBN 切成局部 embedding；训练时用 LAL 教会模型「同歌像、异歌不像」；上线时把曲库 embedding 存进索引，用户查询时先用 ANN 快速粗排，再用 MaxMean 精确精排。</p>
+                </div>
+
+                <h3>适用场景</h3>
+                <ul>
+                    <li>短视频平台音乐识别与版权管理</li>
+                    <li>用户哼唱/弹唱识别</li>
+                    <li>直播背景音乐监测</li>
+                    <li>曲库扩充与版权结算</li>
+                </ul>
+
+                <h3>延伸学习路径</h3>
+                <ul>
+                    <li><strong>音频指纹</strong>：Shazam 等系统的经典做法，适合识别同一录音</li>
+                    <li><strong>音乐信息检索（MIR）</strong>：音乐分类、情感识别、推荐</li>
+                    <li><strong>深度学习音频</strong>：wav2vec、MusicBERT 等预训练模型</li>
+                    <li><strong>向量检索</strong>：HNSW、Faiss、Milvus 等工业级工具</li>
+                </ul>
+
+                <h3>ByteCover3 vs 相关技术</h3>
+                <table>
+                    <tr>
+                        <th>技术</th>
+                        <th>类型</th>
+                        <th>作用</th>
+                        <th>和 ByteCover3 的关系</th>
+                    </tr>
+                    <tr>
+                        <td><strong>ByteCover3</strong></td>
+                        <td>深度学习模型</td>
+                        <td>把音频变成翻唱鲁棒的局部 embedding</td>
+                        <td>核心算法</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Milvus / Faiss</strong></td>
+                        <td>向量数据库 / 检索库</td>
+                        <td>存储高维向量并快速找最近邻</td>
+                        <td>基础设施，可存 ByteCover3 的 embedding</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Shazam landmark 指纹</strong></td>
+                        <td>传统音频指纹</td>
+                        <td>从频谱峰值生成哈希，识别同一录音（原版）</td>
+                        <td>同类问题，但针对原版录音，不擅长翻唱</td>
+                    </tr>
+                </table>
+
+                <div class="highlight-box">
+                    <p><strong>一句话关系</strong>：ByteCover3 负责「算出一个好向量」；Milvus / Faiss 负责「把这些向量存起来、快速找到近的」；Shazam 的 landmark 方法是在解决类似问题，但走的是另一条技术路线，更适合原版录音识别。</p>
+                </div>
+
+                <h3>一句话总结</h3>
+                <div class="highlight-box">
+                    <p><strong>ByteCover3 就是教电脑"不要死记整首歌长什么样，而是学会一段一段地比对"，这样哪怕只听了一小段翻唱，也能在海量歌曲里找到原曲。</strong></p>
+                </div>
+
+                <div class="quiz-container" data-chapter="summary"></div>
+
+                <div class="footer">
+                    <p>基于 ByteCover3 论文学习整理 | 可离线打开复习</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/cases.js"></script>
+    <script src="js/demos/piano-cqt.js"></script>
+    <script src="js/demos/cqt-visualizer.js"></script>
+    <script src="js/demos/maxmean-calculator.js"></script>
+    <script src="js/demos/retrieval-simulator.js"></script>
+    <script src="js/demos/cnn-animation.js"></script>
+    <script src="js/demos/hnsw-animation.js"></script>
+</body>
+</html>
