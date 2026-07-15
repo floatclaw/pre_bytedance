@@ -85,6 +85,19 @@
                 "question": "归一化后的向量，余弦相似度和内积结果相同。",
                 "answer": true,
                 "explanation": "向量归一化后长度为 1，cosine = dot/(1*1) = dot = IP。"
+            },
+            {
+                "id": "c2q4",
+                "type": "mcq",
+                "question": "电影推荐系统中，如果想让「兴趣强的用户」和「热门电影」更容易被匹配，更适合用哪种度量？",
+                "options": [
+                    "Cosine",
+                    "Euclidean",
+                    "Inner Product（IP）",
+                    "Jaccard"
+                ],
+                "answer": 2,
+                "explanation": "IP = ||A|| × ||B|| × cos(θ)，同时受方向和长度影响。用户兴趣强、电影热度高，都会表现为向量长度大，IP 能自然放大这种匹配。"
             }
         ]
     },

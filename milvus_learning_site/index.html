@@ -243,7 +243,53 @@
                     </div>
                 </div>
 
-                <h3>2.2 归一化的影响</h3>
+                <h3>2.2 三种度量分别适合什么场景？</h3>
+
+                <p>三个度量的核心区别在于：<strong>它们对"向量长度"和"向量方向"的敏感程度不同</strong>。</p>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">📐</span>Cosine：只看方向，不看长度</div>
+                    <p><code>cosine(A, B) = (A·B) / (||A|| × ||B||)</code></p>
+                    <p>归一化后长度被消掉，只保留夹角。</p>
+                    <p><strong>为什么适合文本？</strong> 文本 embedding 模型（BERT、OpenAI Embedding）通常把语义相似的句子映射到相近的方向。比如"我今天很开心"和"今天心情很好"用词不同，但意思接近，方向接近，余弦相似度就高。</p>
+                    <p>文本向量的长度往往和句子长度、词频有关，而不是语义。我们看的是"意思像不像"，不是"句子长不长"。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">📏</span>Euclidean（L2）：看直线距离，长度有意义</div>
+                    <p><code>L2(A, B) = √((A₁-B₁)² + (A₂-B₂)² + ...)</code></p>
+                    <p><strong>为什么适合位置、特征强度？</strong> 当向量的"长度"本身就有意义时，L2 更合适。</p>
+                    <p>比如推荐餐厅：<code>餐厅 = [人均消费, 评分, 距离我当前位置]</code></p>
+                    <ul>
+                        <li>餐厅 A：[100, 4.5, 0.5]</li>
+                        <li>餐厅 B：[300, 4.6, 5.0]</li>
+                    </ul>
+                    <p>A 和 B 方向可能接近，但人均消费和实际距离差很多。"离我 0.5 公里"和"离我 5 公里"的体验差异很大，L2 能反映这种绝对差异。</p>
+                    <p>再比如图像亮度：两张图都是橙色调，但一张亮、一张暗。Cosine 会认为很像，L2 会认为很远。如果你想找"亮度也接近"的图片，L2 更合适。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🔥</span>Inner Product（IP）：方向 × 长度，适合推荐</div>
+                    <p><code>IP(A, B) = A·B = ||A|| × ||B|| × cos(θ)</code></p>
+                    <p><strong>为什么适合推荐系统？</strong> 推荐场景里，"长度"往往代表"强度"或"热度"：</p>
+                    <ul>
+                        <li>用户兴趣向量长 → 对这个品类越感兴趣</li>
+                        <li>物品热度向量长 → 这个物品越热门/受欢迎</li>
+                    </ul>
+                    <p>比如电影推荐：<code>用户 = [喜剧喜好, 动作喜好, 爱情喜好]</code></p>
+                    <ul>
+                        <li>用户 A 很喜欢喜剧：[10, 1, 1]</li>
+                        <li>用户 B 一般喜欢喜剧：[1, 0.1, 0.1]</li>
+                        <li>电影《喜剧之王》=[9, 0, 1]</li>
+                    </ul>
+                    <p>用 IP 计算：A·电影 = 91，B·电影 = 9.1。IP 自然地把"兴趣强"的用户和"热门喜剧"匹配在一起。如果用 Cosine，A 和 B 对这部电影的相似度可能差不多，但推荐系统更想把热门内容推给高兴趣用户。</p>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>一句话对比</strong>：Cosine 看方向，适合语义；L2 看绝对距离，适合位置/强度；IP 看方向 × 长度，适合推荐（兴趣和热度）。</p>
+                </div>
+
+                <h3>2.3 归一化的影响</h3>
                 <p>如果向量已经归一化（长度为 1），那么余弦相似度和内积在数学上是等价的：</p>
                 <pre><code>cosine(a, b) = dot(a, b) / (||a|| * ||b||)
 如果 ||a|| = ||b|| = 1，则 cosine(a, b) = dot(a, b) = IP(a, b)</code></pre>
