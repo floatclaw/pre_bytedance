@@ -88,7 +88,7 @@ const MVCases = {
         let html = '';
         this.data.cases.forEach((caseItem, index) => {
             html += `
-                <div class="case-card reveal">
+                <div class="case-card">
                     <div class="case-header">
                         <div class="case-icon">${caseItem.icon}</div>
                         <div>
