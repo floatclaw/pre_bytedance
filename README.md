@@ -1,8 +1,12 @@
 # ByteCover3 学习项目
 
-一个面向零基础学习者的 **ByteCover3** 学习资料集合，包含可交互的静态课程网站和简化版 Python Demo。
+一个面向零基础学习者的学习资料集合，目前包含：
 
-> ByteCover3 是一篇翻唱歌曲识别论文，核心解决的是「用十几秒的短视频片段，从海量歌曲中找到它的翻唱原曲」。
+- **ByteCover3**：翻唱歌曲识别论文学习网站 + Python Demo
+- **Milvus**：向量数据库学习网站
+
+> ByteCover3 核心解决「用十几秒的短视频片段，从海量歌曲中找到它的翻唱原曲」。
+> Milvus 核心解决「如何高效存储和检索高维向量，实现语义搜索」。
 
 ---
 
@@ -10,13 +14,14 @@
 
 ```
 bytedance/
-├── bytecover3_site/          # 可交互静态课程网站（主要学习资料）
-├── bytecover3_demo/          # 简化版 Python Demo，可动手实验
+├── bytecover3_site/          # 翻唱识别交互式课程网站
+├── bytecover3_demo/          # 简化版 Python Demo
+├── milvus_learning_site/     # Milvus 向量数据库交互式课程网站
 └── BYTECOVER3- ACCURATE COVER SONG IDENTIFICATION ON SHORT QUERIES.pdf
                               # 原始论文
 ```
 
-### 1. `bytecover3_site/` — 交互式课程网站
+### 1. `bytecover3_site/` — 翻唱识别交互式课程网站
 
 一个完全静态、可离线使用的学习网站，无需后端和外部 CDN。
 
@@ -77,6 +82,42 @@ python demo.py
 
 ---
 
+### 3. `milvus_learning_site/` — Milvus 向量数据库交互式课程网站
+
+基于 ByteCover3 网站模板构建，专门用于学习 Milvus 向量数据库。
+
+**内容结构：**
+- 导学：什么是向量数据库
+- 第 1 章：向量与 Embedding
+- 第 2 章：相似度度量（Cosine / Euclidean / IP）
+- 第 3 章：ANN 与索引（FLAT / IVF / HNSW）
+- 第 4 章：Milvus 核心概念（Collection / Entity / Field / Schema / Partition）
+- 第 5 章：数据建模与写入
+- 第 6 章：搜索与查询（search / query / 混合搜索）
+- 第 7 章：部署与生态
+- 第 8 章：真实案例与面试题
+- 总结与延伸
+
+**交互 Demo：**
+- Embedding Explorer：观察 Top-K 最近邻
+- Similarity Metrics：比较 Cosine / Euclidean / IP
+- Index Comparison：FLAT / IVF / HNSW 对比
+- Search Simulator：生成 PyMilvus 代码
+- Collection Designer：设计 Schema 并生成代码
+
+**如何打开：**
+
+```bash
+cd milvus_learning_site
+python3 -m http.server 8080
+```
+
+然后访问 http://localhost:8080
+
+详见 [`milvus_learning_site/README.md`](milvus_learning_site/README.md)。
+
+---
+
 ## 学习建议
 
 1. **先看网站**：按章节顺序阅读，配合交互 Demo 理解概念。
@@ -96,7 +137,7 @@ python demo.py
 
 ## 离线使用
 
-本项目没有任何外部 CDN 依赖，所有 CSS、JS、图片都是本地文件。把整个目录复制到任何地方，双击 `bytecover3_site/index.html` 即可离线学习。
+本项目没有任何外部 CDN 依赖，所有 CSS、JS、图片都是本地文件。把整个目录复制到任何地方，双击 `bytecover3_site/index.html` 或 `milvus_learning_site/index.html` 即可离线学习。
 
 ---
 

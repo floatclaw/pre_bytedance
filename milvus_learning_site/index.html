@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milvus 零基础学习指南</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/demos.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Milvus</div>
+                <div class="sidebar-subtitle">零基础学习指南</div>
+            </div>
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>学习进度</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="nav-section">目录</div>
+            <ul class="nav-list">
+                <li class="nav-item"><a href="#intro" class="nav-link">导学</a></li>
+                <li class="nav-item"><a href="#chapter1" class="nav-link">第 1 章：向量与 Embedding</a></li>
+                <li class="nav-item"><a href="#chapter2" class="nav-link">第 2 章：相似度度量</a></li>
+                <li class="nav-item"><a href="#chapter3" class="nav-link">第 3 章：ANN 与索引</a></li>
+                <li class="nav-item"><a href="#chapter4" class="nav-link">第 4 章：Milvus 核心概念</a></li>
+                <li class="nav-item"><a href="#chapter5" class="nav-link">第 5 章：数据建模与写入</a></li>
+                <li class="nav-item"><a href="#chapter6" class="nav-link">第 6 章：搜索与查询</a></li>
+                <li class="nav-item"><a href="#chapter7" class="nav-link">第 7 章：部署与生态</a></li>
+                <li class="nav-item"><a href="#chapter8" class="nav-link">第 8 章：真实案例与面试题</a></li>
+                <li class="nav-item"><a href="#summary" class="nav-link">总结与延伸</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="top-bar">
+                <button class="menu-toggle" id="menuToggle">☰ 目录</button>
+                <button class="theme-toggle" id="themeToggle">🌙 暗色模式</button>
+            </div>
+
+            <!-- Hero -->
+            <section class="hero" id="intro">
+                <span class="hero-badge">零基础友好 · 可交互</span>
+                <h1>Milvus 学习指南</h1>
+                <p>一步一步理解 Milvus：如何用向量数据库实现语义搜索、以图搜图、RAG 检索和推荐系统。</p>
+                <div class="hero-actions">
+                    <a href="#chapter1" class="btn btn-primary">开始</a>
+                    <a href="#chapter8" class="btn btn-secondary">先看业务场景</a>
+                </div>
+            </section>
+
+            <!-- Roadmap -->
+            <h2>学习路线</h2>
+            <div class="roadmap">
+                <a href="#chapter1" class="roadmap-item">
+                    <div class="roadmap-number">1</div>
+                    <div class="roadmap-content">
+                        <h4>向量与 Embedding</h4>
+                        <p>什么是向量？文本/图像如何变成向量？</p>
+                    </div>
+                </a>
+                <a href="#chapter2" class="roadmap-item">
+                    <div class="roadmap-number">2</div>
+                    <div class="roadmap-content">
+                        <h4>相似度度量</h4>
+                        <p>Cosine、Euclidean、Inner Product 的区别与选择</p>
+                    </div>
+                </a>
+                <a href="#chapter3" class="roadmap-item">
+                    <div class="roadmap-number">3</div>
+                    <div class="roadmap-content">
+                        <h4>ANN 与索引</h4>
+                        <p>为什么需要近似最近邻？FLAT / IVF / HNSW</p>
+                    </div>
+                </a>
+                <a href="#chapter4" class="roadmap-item">
+                    <div class="roadmap-number">4</div>
+                    <div class="roadmap-content">
+                        <h4>Milvus 核心概念</h4>
+                        <p>Collection、Entity、Field、Schema、Partition</p>
+                    </div>
+                </a>
+                <a href="#chapter5" class="roadmap-item">
+                    <div class="roadmap-number">5</div>
+                    <div class="roadmap-content">
+                        <h4>数据建模与写入</h4>
+                        <p>Schema 设计、主键、向量维度、批量插入</p>
+                    </div>
+                </a>
+                <a href="#chapter6" class="roadmap-item">
+                    <div class="roadmap-number">6</div>
+                    <div class="roadmap-content">
+                        <h4>搜索与查询</h4>
+                        <p>search / query、top-k、标量过滤、混合搜索</p>
+                    </div>
+                </a>
+                <a href="#chapter7" class="roadmap-item">
+                    <div class="roadmap-number">7</div>
+                    <div class="roadmap-content">
+                        <h4>部署与生态</h4>
+                        <p>Standalone vs Cluster、Docker、Attu、SDK</p>
+                    </div>
+                </a>
+                <a href="#chapter8" class="roadmap-item">
+                    <div class="roadmap-number">8</div>
+                    <div class="roadmap-content">
+                        <h4>真实案例与面试题</h4>
+                        <p>RAG、以图搜图、推荐、面试 Q&A</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Chapter 1 -->
+            <section id="chapter1">
+                <h2>第 1 章：向量与 Embedding</h2>
+
+                <h3>1.1 为什么需要向量数据库？</h3>
+                <p>传统数据库擅长回答这样的问题：</p>
+                <ul>
+                    <li>"价格等于 100 元的商品有哪些？"</li>
+                    <li>"用户 ID 是 12345 的订单状态是什么？"</li>
+                </ul>
+                <p>但现实中的很多数据是<strong>非结构化</strong>的：一段文字、一张图片、一段音频。我们想问的是：</p>
+                <ul>
+                    <li>"和这张图<strong>长得像</strong>的商品有哪些？"</li>
+                    <li>"和这个问题<strong>语义相关</strong>的文档有哪些？"</li>
+                    <li>"和用户兴趣<strong>最接近</strong>的内容有哪些？"</li>
+                </ul>
+                <p><strong>向量数据库</strong>就是用来解决这类"相似性搜索"问题的数据库。Milvus 是其中最流行的开源实现之一。</p>
+
+                <div class="highlight-box">
+                    <p><strong>一句话</strong>：关系型数据库回答"等不等于"，向量数据库回答"像不像"。</p>
+                </div>
+
+                <h3>1.2 什么是向量？</h3>
+                <p>向量就是一串数字。你可以把它想象成空间中的一个点：</p>
+                <ul>
+                    <li>2 维向量：平面上的一个点 <code>[x, y]</code></li>
+                    <li>3 维向量：空间中的一个点 <code>[x, y, z]</code></li>
+                    <li>128 / 512 / 1536 维向量：高维空间中的点（虽然画不出来，但数学上一样处理）</li>
+                </ul>
+
+                <p>在向量数据库里，我们关心的是两个向量之间的<strong>距离</strong>或<strong>相似度</strong>。距离越小（或相似度越高），代表它们越"像"。</p>
+
+                <h3>1.3 什么是 Embedding？</h3>
+                <p><strong>Embedding</strong>是把真实世界的东西（文字、图片、声音）转换成向量的过程。</p>
+
+                <p>例子：</p>
+                <ul>
+                    <li><strong>文本</strong>：用 BERT、OpenAI Embedding 等模型，把一句话变成 1536 维向量</li>
+                    <li><strong>图像</strong>：用 ResNet、CLIP 等模型，把一张图变成 512 维向量</li>
+                    <li><strong>音频</strong>：用音频模型，把一段声音变成向量</li>
+                </ul>
+
+                <p>好的 embedding 模型有个特点：语义相近的东西，向量也更接近。比如"猫"和" kitten"的向量会比"猫"和"汽车"更接近。</p>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🔍 Embedding Explorer</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">在 2D 平面上生成若干簇向量，点击任意点作为查询向量，观察哪些点被判定为"最相似"。</div>
+                    <div id="embedding-explorer-demo"></div>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>向量：一串数字，可以表示高维空间中的一个点</li>
+                        <li>Embedding：把文本/图像/音频等非结构化数据转成向量的过程</li>
+                        <li>向量数据库：专门存储和检索高维向量的数据库</li>
+                        <li>Milvus：开源向量数据库，支持海量向量的近似最近邻搜索</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter1"></div>
+            </section>
+
+            <!-- Chapter 2 -->
+            <section id="chapter2">
+                <h2>第 2 章：相似度度量</h2>
+
+                <h3>2.1 如何比较两个向量？</h3>
+                <p>向量数据库的核心问题是：给定一个查询向量，从数据库里找到和它最相似的向量。</p>
+                <p>"相似"有很多种定义方式，Milvus 主要支持三种：</p>
+
+                <div class="comparison comparison-3">
+                    <div class="comparison-box">
+                        <h4>余弦相似度 Cosine</h4>
+                        <p>看两个向量之间的<strong>夹角</strong>。</p>
+                        <p>夹角越小，相似度越高。对向量长度不敏感。</p>
+                        <p><strong>适合</strong>：文本语义相似度、主题匹配。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>欧氏距离 Euclidean（L2）</h4>
+                        <p>看两个向量终点之间的<strong>直线距离</strong>。</p>
+                        <p>距离越小越相似。对绝对大小敏感。</p>
+                        <p><strong>适合</strong>：对数值大小敏感的场景，如位置、特征强度。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>内积 Inner Product（IP）</h4>
+                        <p>两个向量对应位置相乘再相加。</p>
+                        <p>值越大越相似。同时受方向和长度影响。</p>
+                        <p><strong>适合</strong>：推荐系统，能同时反映兴趣和热度。</p>
+                    </div>
+                </div>
+
+                <h3>2.2 归一化的影响</h3>
+                <p>如果向量已经归一化（长度为 1），那么余弦相似度和内积在数学上是等价的：</p>
+                <pre><code>cosine(a, b) = dot(a, b) / (||a|| * ||b||)
+如果 ||a|| = ||b|| = 1，则 cosine(a, b) = dot(a, b) = IP(a, b)</code></pre>
+
+                <p>这就是为什么很多文本 embedding 模型输出已经归一化，用 cosine 和 IP 结果一样。</p>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">📐 相似度度量比较</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">观察同样的向量对，用 Cosine、Euclidean、IP 分别计算会得到什么结果。</div>
+                    <div id="similarity-metrics-demo"></div>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>Cosine：看方向，适合语义相似度</li>
+                        <li>Euclidean：看直线距离，适合对大小敏感的场景</li>
+                        <li>IP：内积，受方向和长度共同影响</li>
+                        <li>归一化后，Cosine 和 IP 等价</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter2"></div>
+            </section>
+
+            <!-- Chapter 3 -->
+            <section id="chapter3">
+                <h2>第 3 章：ANN 与索引</h2>
+
+                <h3>3.1 暴力搜索的问题</h3>
+                <p>假设你有 1000 万个 128 维向量，每次查询都要和这 1000 万个向量逐一算距离：</p>
+                <pre><code>1000 万 × 128 次运算 = 12.8 亿次运算/查询</code></pre>
+                <p>这还没考虑磁盘 IO。如果每秒有几百次查询，系统根本扛不住。</p>
+
+                <h3>3.2 ANN：用少量精度换速度</h3>
+                <p><strong>ANN（Approximate Nearest Neighbor，近似最近邻）</strong>的思想是：不要找绝对最近的，而是找一个<strong>足够近</strong>的结果，同时速度大幅提升。</p>
+
+                <p>衡量 ANN 效果的两个关键指标：</p>
+                <ul>
+                    <li><strong>Recall（召回率）</strong>：返回的结果中有多少是真正的最近邻</li>
+                    <li><strong>Latency（延迟）</strong>：每次查询耗时多久</li>
+                </ul>
+
+                <h3>3.3 常见索引类型</h3>
+
+                <div class="comparison comparison-3">
+                    <div class="comparison-box">
+                        <h4>FLAT / Brute Force</h4>
+                        <p><strong>原理</strong>：暴力扫描所有向量。</p>
+                        <p><strong>优点</strong>：结果 100% 精确。</p>
+                        <p><strong>缺点</strong>：数据量大时极慢。</p>
+                        <p><strong>适合</strong>：数据量小（< 10 万）或对精度要求极高的场景。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>IVF_FLAT / IVF_SQ8</h4>
+                        <strong>原理</strong>：先把向量聚类成若干桶，查询时只搜索最近的几个桶。
+                        <p><strong>优点</strong>：速度比 FLAT 快很多，参数可控。</p>
+                        <p><strong>缺点</strong>：需要调 nlist/nprobe，桶内还是暴力比较。</p>
+                        <p><strong>适合</strong>：中等规模数据，预算有限。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>HNSW</h4>
+                        <strong>原理</strong>：构建多层图结构，查询时从顶层贪心下降到最近邻。
+                        <p><strong>优点</strong>：搜索速度快，召回率高。</p>
+                        <p><strong>缺点</strong>：建索引慢，内存占用大。</p>
+                        <p><strong>适合</strong>：高并发在线服务。</p>
+                    </div>
+                </div>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">⚡ 索引对比模拟器</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">对比 FLAT、IVF、HNSW 三种索引在查询耗时和召回率上的差异。</div>
+                    <div id="index-comparison-demo"></div>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>ANN：近似最近邻，用少量精度损失换取大幅速度提升</li>
+                        <li>FLAT：精确但慢，适合小数据量</li>
+                        <li>IVF：聚类分桶，查询只搜部分桶，速度较快</li>
+                        <li>HNSW：多层图索引，搜索快但内存占用大</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter3"></div>
+            </section>
+
+            <!-- Chapter 4 -->
+            <section id="chapter4">
+                <h2>第 4 章：Milvus 核心概念</h2>
+
+                <h3>4.1 从关系数据库类比</h3>
+                <table>
+                    <tr>
+                        <th>关系数据库</th>
+                        <th>Milvus</th>
+                    </tr>
+                    <tr>
+                        <td>数据库 Database</td>
+                        <td>Cluster / Milvus 实例</td>
+                    </tr>
+                    <tr>
+                        <td>表 Table</td>
+                        <td>Collection</td>
+                    </tr>
+                    <tr>
+                        <td>行 Row</td>
+                        <td>Entity</td>
+                    </tr>
+                    <tr>
+                        <td>列 Column</td>
+                        <td>Field</td>
+                    </tr>
+                    <tr>
+                        <td>表结构 Schema</td>
+                        <td>Schema</td>
+                    </tr>
+                    <tr>
+                        <td>索引 Index</td>
+                        <td>Index（向量索引 + 标量索引）</td>
+                    </tr>
+                </table>
+
+                <h3>4.2 核心概念解释</h3>
+                <ul>
+                    <li><strong>Collection（集合）</strong>：数据的逻辑容器，类似一张表。</li>
+                    <li><strong>Entity（实体）</strong>：Collection 中的一条记录，包含多个 Field。</li>
+                    <li><strong>Field（字段）</strong>：Entity 的一个属性，比如主键、向量、标量标签。</li>
+                    <li><strong>Schema（模式）</strong>：定义 Collection 有哪些 Field、什么类型、是否为主键。</li>
+                    <li><strong>Partition（分区）</strong>：Collection 内的逻辑分片，常用于按时间/业务维度切分数据。</li>
+                    <li><strong>Index（索引）</strong>：加速向量搜索的数据结构，如 IVF_FLAT、HNSW。</li>
+                    <li><strong>Metric Type（度量类型）</strong>：搜索时使用的距离/相似度，如 COSINE、L2、IP。</li>
+                </ul>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🧱 Collection 设计器</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">通过表单设计一个 Milvus Collection，实时生成对应的 JSON Schema 和 PyMilvus 代码。</div>
+                    <div id="collection-designer-demo"></div>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>Collection 类似表，是 Milvus 的顶层数据组织单元</li>
+                        <li>Entity 类似行，是一条完整记录</li>
+                        <li>Field 包含主键、向量字段和标量字段</li>
+                        <li>Partition 是 Collection 内的逻辑分片</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter4"></div>
+            </section>
+
+            <!-- Chapter 5 -->
+            <section id="chapter5">
+                <h2>第 5 章：数据建模与写入</h2>
+
+                <h3>5.1 Schema 设计</h3>
+                <p>设计 Milvus Collection 时，通常需要这几类字段：</p>
+                <ul>
+                    <li><strong>主键字段</strong>：唯一标识每个 entity，通常是 INT64 或 VARCHAR</li>
+                    <li><strong>向量字段</strong>：FLOAT_VECTOR 或 BINARY_VECTOR，维度由 embedding 模型决定</li>
+                    <li><strong>标量字段</strong>：用于过滤和展示，如类别、时间、状态等</li>
+                </ul>
+
+                <p>一个典型的文档检索 Collection Schema：</p>
+                <pre><code>{
+  "fields": [
+    { "name": "id", "type": "INT64", "is_primary": true, "auto_id": true },
+    { "name": "doc_id", "type": "VARCHAR", "max_length": 64 },
+    { "name": "content", "type": "VARCHAR", "max_length": 65535 },
+    { "name": "category", "type": "VARCHAR", "max_length": 32 },
+    { "name": "embedding", "type": "FLOAT_VECTOR", "dim": 1536 }
+  ]
+}</code></pre>
+
+                <h3>5.2 写入数据</h3>
+                <p>写入数据的基本流程：</p>
+                <ol>
+                    <li>连接 Milvus</li>
+                    <li>创建 Collection（如果还没有）</li>
+                    <li>创建 Index（针对向量字段）</li>
+                    <li>加载 Collection</li>
+                    <li>插入数据</li>
+                </ol>
+
+                <div class="highlight-box">
+                    <p><strong>注意</strong>：向量字段的维度在创建 Collection 时就确定了，之后不能修改。如果换了 embedding 模型，通常需要重新建表。</p>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>Schema 必须包含主键和向量字段</li>
+                        <li>向量维度由 embedding 模型决定，创建后不可改</li>
+                        <li>标量字段可用于过滤和展示</li>
+                        <li>写入前通常要先创建索引并加载 Collection</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter5"></div>
+            </section>
+
+            <!-- Chapter 6 -->
+            <section id="chapter6">
+                <h2>第 6 章：搜索与查询</h2>
+
+                <h3>6.1 search()：向量相似度搜索</h3>
+                <p><code>search()</code> 是 Milvus 最核心的 API：给定一个或多个查询向量，返回最相似的 top-k 个结果。</p>
+
+                <pre><code>results = collection.search(
+    data=[query_embedding],
+    anns_field="embedding",
+    param={"metric_type": "COSINE", "params": {"nprobe": 10}},
+    limit=5,
+    expr="category == 'tech'",
+    output_fields=["content"]
+)</code></pre>
+
+                <p>参数说明：</p>
+                <ul>
+                    <li><strong>data</strong>：查询向量列表</li>
+                    <li><strong>anns_field</strong>：要搜索的向量字段名</li>
+                    <li><strong>param</strong>：索引搜索参数，如 nprobe、ef</li>
+                    <li><strong>limit</strong>：返回结果数量（top-k）</li>
+                    <li><strong>expr</strong>：标量过滤条件</li>
+                    <li><strong>output_fields</strong>：返回的附加字段</li>
+                </ul>
+
+                <h3>6.2 query()：标量过滤查询</h3>
+                <p><code>query()</code> 用于根据标量条件精确查询，不走向量索引：</p>
+
+                <pre><code>results = collection.query(
+    expr="category == 'tech' and create_time > 1700000000",
+    output_fields=["id", "content"]
+)</code></pre>
+
+                <h3>6.3 混合搜索</h3>
+                <p><strong>混合搜索</strong> = 向量相似度搜索 + 标量过滤。先按向量召回一批候选，再用 expr 过滤掉不符合标量条件的，最后返回结果。</p>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🔎 搜索模拟器</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">设置查询向量、top-k、距离阈值和标量过滤条件，观察命中结果并生成对应的 PyMilvus 代码。</div>
+                    <div id="search-simulator-demo"></div>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>search() 基于向量做近似最近邻搜索</li>
+                        <li>query() 基于标量条件做精确过滤</li>
+                        <li>top-k 控制返回最相似结果的数量</li>
+                        <li>expr 可以在向量搜索时附加标量过滤条件</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter6"></div>
+            </section>
+
+            <!-- Chapter 7 -->
+            <section id="chapter7">
+                <h2>第 7 章：部署与生态</h2>
+
+                <h3>7.1 Standalone vs Cluster</h3>
+                <div class="comparison">
+                    <div class="comparison-box">
+                        <h4>Standalone</h4>
+                        <p>单节点部署，所有组件跑在一台机器上。</p>
+                        <ul>
+                            <li>部署简单</li>
+                            <li>适合开发、测试、小规模应用</li>
+                            <li>横向扩展能力有限</li>
+                        </ul>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>Cluster</h4>
+                        <p>分布式部署，角色分离。</p>
+                        <ul>
+                            <li>可水平扩展</li>
+                            <li>适合大规模生产环境</li>
+                            <li>运维复杂度更高</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3>7.2 核心组件</h3>
+                <ul>
+                    <li><strong>Milvus</strong>：核心数据库服务</li>
+                    <li><strong>etcd</strong>：元数据存储</li>
+                    <li><strong>MinIO / S3</strong>：对象存储，持久化数据</li>
+                    <li><strong>Pulsar / Kafka</strong>：Cluster 模式下的消息队列（可选）</li>
+                </ul>
+
+                <h3>7.3 生态工具</h3>
+                <ul>
+                    <li><strong>PyMilvus / GoMilvus / Node.js SDK</strong>：各语言客户端</li>
+                    <li><strong>Attu</strong>：图形化管理界面</li>
+                    <li><strong>Zilliz Cloud</strong>：Milvus 的全托管云服务</li>
+                    <li><strong>Milvus CLI</strong>：命令行工具</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p><strong>快速开始</strong>：用 Docker Compose 启动 Milvus Standalone 是最常见的本地体验方式。</p>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>Standalone 适合开发和中小规模</li>
+                        <li>Cluster 适合大规模分布式生产环境</li>
+                        <li>etcd 存元数据，MinIO/S3 存实际数据</li>
+                        <li>Attu 是 Milvus 的 GUI 管理工具</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter7"></div>
+            </section>
+
+            <!-- Chapter 8 -->
+            <section id="chapter8">
+                <h2>第 8 章：真实案例与面试题</h2>
+
+                <h3>8.1 真实案例</h3>
+                <div id="cases-container"></div>
+
+                <h3>8.2 面试高频题</h3>
+                <div id="interview-container"></div>
+
+                <div class="quiz-container" data-chapter="chapter8"></div>
+            </section>
+
+            <!-- Summary -->
+            <section id="summary">
+                <h2>总结与延伸</h2>
+
+                <h3>Milvus 完整流程</h3>
+                <div class="process-flow">
+                    <span class="process-step">原始数据</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">Embedding 模型</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">Milvus 写入</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">建索引</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">向量搜索</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">业务应用</span>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">1️⃣</span>数据准备</div>
+                    <p>把文本、图像、音频等非结构化数据通过模型转成向量。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">2️⃣</span>Schema 设计</div>
+                    <p>设计 Collection，包含主键、向量字段、标量字段，指定维度和 metric type。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">3️⃣</span>写入与索引</div>
+                    <p>插入数据，为向量字段创建索引（FLAT/IVF/HNSW），加载 Collection。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">4️⃣</span>搜索查询</div>
+                    <p>用 search() 做向量相似度搜索，用 query() 做标量过滤，两者结合做混合搜索。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">5️⃣</span>业务集成</div>
+                    <p>把搜索结果交给下游应用，如 RAG 上下文、推荐列表、以图搜图结果。</p>
+                </div>
+
+                <h3>核心要点回顾</h3>
+                <div class="comparison comparison-3">
+                    <div class="comparison-box">
+                        <h4>1. Embedding</h4>
+                        <p>把非结构化数据转成向量，让机器能"比较像不像"。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>2. ANN 索引</h4>
+                        <p>用 FLAT、IVF、HNSW 等索引在海量向量中快速找最近邻。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>3. 混合搜索</h4>
+                        <p>向量相似度 + 标量过滤，满足复杂业务查询需求。</p>
+                    </div>
+                </div>
+
+                <h3>延伸学习路径</h3>
+                <ul>
+                    <li><strong>Embedding 模型</strong>：BERT、OpenAI Embedding、CLIP、Sentence-BERT</li>
+                    <li><strong>向量检索算法</strong>：HNSW、IVF、PQ、ScaNN</li>
+                    <li><strong>RAG 架构</strong>：LangChain、LlamaIndex、文档分块策略</li>
+                    <li><strong>Milvus 生态</strong>：Attu、Zilliz Cloud、Milvus Operator on Kubernetes</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p><strong>一句话总结</strong>：Milvus 让"像不像"的模糊问题变成了可以高效计算和检索的工程问题，是连接 AI embedding 与业务应用的桥梁。</p>
+                </div>
+
+                <div class="quiz-container" data-chapter="summary"></div>
+
+                <div class="footer">
+                    <p>基于 Milvus 学习整理 | 可离线打开复习</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/cases.js"></script>
+    <script src="js/demos/embedding-explorer.js"></script>
+    <script src="js/demos/similarity-metrics.js"></script>
+    <script src="js/demos/index-comparison.js"></script>
+    <script src="js/demos/search-simulator.js"></script>
+    <script src="js/demos/collection-designer.js"></script>
+</body>
+</html>

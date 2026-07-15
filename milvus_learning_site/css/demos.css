@@ -1,0 +1,240 @@
+/* Demo container */
+.demo-container {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 24px 0;
+    box-shadow: var(--shadow);
+}
+
+.demo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.demo-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.demo-badge {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: var(--accent-light);
+    color: var(--accent-dark);
+    font-weight: 600;
+}
+
+.demo-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+}
+
+.demo-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.demo-control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.demo-control-group label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.demo-control-group select,
+.demo-control-group input[type="range"] {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.demo-canvas {
+    width: 100%;
+    border-radius: 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+}
+
+.demo-output {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--bg-primary);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    font-family: "Menlo", "Monaco", "Courier New", monospace;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    min-height: 60px;
+}
+
+/* Piano CQT */
+.piano-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.piano {
+    display: flex;
+    position: relative;
+    height: 160px;
+    padding: 0 4px;
+}
+
+.piano-key {
+    position: relative;
+    width: 40px;
+    height: 100%;
+    border: 1px solid var(--border);
+    border-radius: 0 0 6px 6px;
+    background: var(--bg-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 10px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    transition: background 0.1s;
+}
+
+.piano-key:hover {
+    background: var(--accent-light);
+}
+
+.piano-key.active {
+    background: var(--accent);
+    color: white;
+}
+
+.piano-key.black {
+    position: absolute;
+    width: 26px;
+    height: 60%;
+    background: var(--text-primary);
+    color: white;
+    z-index: 2;
+    border-radius: 0 0 4px 4px;
+}
+
+.piano-key.black.active {
+    background: var(--accent);
+}
+
+.cqt-display {
+    width: 100%;
+    height: 200px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+/* MaxMean calculator */
+.maxmean-layout {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 16px;
+    align-items: start;
+}
+
+.maxmean-panel {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.maxmean-panel h4 {
+    margin-top: 0;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.maxmean-canvas {
+    width: 100%;
+    height: 220px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .maxmean-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Retrieval simulator */
+.retrieval-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.retrieval-panel {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.retrieval-panel h4 {
+    margin-top: 0;
+    font-size: 1rem;
+}
+
+.retrieval-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.stat-box {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .retrieval-layout {
+        grid-template-columns: 1fr;
+    }
+    .retrieval-stats {
+        grid-template-columns: 1fr;
+    }
+}
