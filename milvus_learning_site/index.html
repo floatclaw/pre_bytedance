@@ -251,6 +251,22 @@
                     <div class="card-title"><span class="card-icon">📐</span>Cosine：只看方向，不看长度</div>
                     <p><code>cosine(A, B) = (A·B) / (||A|| × ||B||)</code></p>
                     <p>归一化后长度被消掉，只保留夹角。</p>
+
+                    <figure class="metric-figure">
+                        <svg viewBox="0 0 320 160" preserveAspectRatio="xMidYMid meet" aria-label="Cosine 相似度示意图">
+                            <line x1="20" y1="140" x2="300" y2="140" stroke="var(--border)" stroke-width="1"/>
+                            <line x1="20" y1="140" x2="20" y2="20" stroke="var(--border)" stroke-width="1"/>
+                            <line x1="20" y1="140" x2="260" y2="50" stroke="#3b82f6" stroke-width="3"/>
+                            <line x1="20" y1="140" x2="200" y2="80" stroke="#10b981" stroke-width="3"/>
+                            <path d="M 80 125 A 40 40 0 0 0 65 95" fill="none" stroke="var(--text-secondary)" stroke-width="1.5"/>
+                            <text x="75" y="115" font-size="12" fill="var(--text-secondary)">θ</text>
+                            <text x="230" y="45" font-size="12" fill="#3b82f6">A（长）</text>
+                            <text x="170" y="75" font-size="12" fill="#10b981">B（短）</text>
+                            <text x="90" y="155" font-size="12" fill="var(--text-secondary)">方向接近 → Cosine 高</text>
+                        </svg>
+                        <figcaption>Cosine 只看两个向量的夹角 θ，与长度无关。A 和 B 一长一短，但方向接近，Cosine 就高。</figcaption>
+                    </figure>
+
                     <p><strong>为什么适合文本？</strong> 文本 embedding 模型（BERT、OpenAI Embedding）通常把语义相似的句子映射到相近的方向。比如"我今天很开心"和"今天心情很好"用词不同，但意思接近，方向接近，余弦相似度就高。</p>
                     <p>文本向量的长度往往和句子长度、词频有关，而不是语义。我们看的是"意思像不像"，不是"句子长不长"。</p>
                 </div>
@@ -259,6 +275,22 @@
                     <div class="card-title"><span class="card-icon">📏</span>Euclidean（L2）：看直线距离，长度有意义</div>
                     <p><code>L2(A, B) = √((A₁-B₁)² + (A₂-B₂)² + ...)</code></p>
                     <p><strong>为什么适合位置、特征强度？</strong> 当向量的"长度"本身就有意义时，L2 更合适。</p>
+
+                    <figure class="metric-figure">
+                        <svg viewBox="0 0 320 160" preserveAspectRatio="xMidYMid meet" aria-label="欧氏距离示意图">
+                            <line x1="20" y1="140" x2="300" y2="140" stroke="var(--border)" stroke-width="1"/>
+                            <line x1="20" y1="140" x2="20" y2="20" stroke="var(--border)" stroke-width="1"/>
+                            <line x1="20" y1="140" x2="200" y2="60" stroke="#3b82f6" stroke-width="3"/>
+                            <line x1="20" y1="140" x2="120" y2="100" stroke="#10b981" stroke-width="3"/>
+                            <line x1="120" y1="100" x2="200" y2="60" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5 5"/>
+                            <text x="210" y="55" font-size="12" fill="#3b82f6">A</text>
+                            <text x="95" y="95" font-size="12" fill="#10b981">B</text>
+                            <text x="150" y="75" font-size="12" fill="#f59e0b">L2 距离</text>
+                            <text x="90" y="155" font-size="12" fill="var(--text-secondary)">终点距离近 → L2 小</text>
+                        </svg>
+                        <figcaption>L2 看两个向量终点之间的直线距离。即使方向接近，如果终点离得远，L2 也会很大。</figcaption>
+                    </figure>
+
                     <p>比如推荐餐厅：<code>餐厅 = [人均消费, 评分, 距离我当前位置]</code></p>
                     <ul>
                         <li>餐厅 A：[100, 4.5, 0.5]</li>
@@ -272,6 +304,23 @@
                     <div class="card-title"><span class="card-icon">🔥</span>Inner Product（IP）：方向 × 长度，适合推荐</div>
                     <p><code>IP(A, B) = A·B = ||A|| × ||B|| × cos(θ)</code></p>
                     <p><strong>为什么适合推荐系统？</strong> 推荐场景里，"长度"往往代表"强度"或"热度"：</p>
+
+                    <figure class="metric-figure">
+                        <svg viewBox="0 0 320 160" preserveAspectRatio="xMidYMid meet" aria-label="内积示意图">
+                            <line x1="20" y1="140" x2="300" y2="140" stroke="var(--border)" stroke-width="1"/>
+                            <line x1="20" y1="140" x2="20" y2="20" stroke="var(--border)" stroke-width="1"/>
+                            <line x1="20" y1="140" x2="260" y2="50" stroke="#3b82f6" stroke-width="5"/>
+                            <line x1="20" y1="140" x2="220" y2="75" stroke="#10b981" stroke-width="2"/>
+                            <line x1="20" y1="140" x2="130" y2="95" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 4"/>
+                            <text x="265" y="45" font-size="12" fill="#3b82f6">A（兴趣强）</text>
+                            <text x="225" y="70" font-size="12" fill="#10b981">B（热门）</text>
+                            <text x="100" y="90" font-size="12" fill="#f59e0b">C（一般）</text>
+                            <text x="60" y="155" font-size="12" fill="var(--text-secondary)">A×B：方向近且长度都大 → IP 很高</text>
+                            <text x="60" y="170" font-size="12" fill="var(--text-secondary)">A×C：方向近但长度小 → IP 较低</text>
+                        </svg>
+                        <figcaption>IP = 方向相似度 × 长度 × 长度。A 和 B 方向接近且长度都大，IP 很高；A 和 C 方向也接近但 C 很短，IP 明显更低。</figcaption>
+                    </figure>
+
                     <ul>
                         <li>用户兴趣向量长 → 对这个品类越感兴趣</li>
                         <li>物品热度向量长 → 这个物品越热门/受欢迎</li>
