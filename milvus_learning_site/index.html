@@ -260,11 +260,11 @@
                             <line x1="20" y1="140" x2="200" y2="80" stroke="#10b981" stroke-width="3"/>
                             <path d="M 80 125 A 40 40 0 0 0 65 95" fill="none" stroke="var(--text-secondary)" stroke-width="1.5"/>
                             <text x="75" y="115" font-size="12" fill="var(--text-secondary)">θ</text>
-                            <text x="230" y="45" font-size="12" fill="#3b82f6">A（长）</text>
-                            <text x="170" y="75" font-size="12" fill="#10b981">B（短）</text>
-                            <text x="90" y="155" font-size="12" fill="var(--text-secondary)">方向接近 → Cosine 高</text>
+                            <text x="230" y="45" font-size="12" fill="#3b82f6">A=[0.8,0.8]</text>
+                            <text x="170" y="75" font-size="12" fill="#10b981">B=[0.3,0.3]</text>
+                            <text x="90" y="155" font-size="12" fill="var(--text-secondary)">方向相同 → Cosine=1.0</text>
                         </svg>
-                        <figcaption>Cosine 只看两个向量的夹角 θ，与长度无关。A 和 B 一长一短，但方向接近，Cosine 就高。</figcaption>
+                        <figcaption>Cosine 只看两个向量的夹角 θ，与长度无关。例如 A=[0.8, 0.8] 比 B=[0.3, 0.3] 长很多，但方向相同，Cosine = 1.0。</figcaption>
                     </figure>
 
                     <p><strong>为什么适合文本？</strong> 文本 embedding 模型（BERT、OpenAI Embedding）通常把语义相似的句子映射到相近的方向。比如"我今天很开心"和"今天心情很好"用词不同，但意思接近，方向接近，余弦相似度就高。</p>
@@ -283,12 +283,12 @@
                             <line x1="20" y1="140" x2="200" y2="60" stroke="#3b82f6" stroke-width="3"/>
                             <line x1="20" y1="140" x2="120" y2="100" stroke="#10b981" stroke-width="3"/>
                             <line x1="120" y1="100" x2="200" y2="60" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5 5"/>
-                            <text x="210" y="55" font-size="12" fill="#3b82f6">A</text>
-                            <text x="95" y="95" font-size="12" fill="#10b981">B</text>
-                            <text x="150" y="75" font-size="12" fill="#f59e0b">L2 距离</text>
-                            <text x="90" y="155" font-size="12" fill="var(--text-secondary)">终点距离近 → L2 小</text>
+                            <text x="210" y="55" font-size="12" fill="#3b82f6">A=[0.8,0.8]</text>
+                            <text x="95" y="95" font-size="12" fill="#10b981">B=[0.3,0.3]</text>
+                            <text x="150" y="75" font-size="12" fill="#f59e0b">L2≈0.71</text>
+                            <text x="90" y="155" font-size="12" fill="var(--text-secondary)">终点距离远 → L2 大</text>
                         </svg>
-                        <figcaption>L2 看两个向量终点之间的直线距离。即使方向接近，如果终点离得远，L2 也会很大。</figcaption>
+                        <figcaption>L2 看两个向量终点之间的直线距离。例如 A=[0.8, 0.8] 和 B=[0.3, 0.3] 方向相同，但终点距离 ≈ 0.71，L2 明显大于 0。</figcaption>
                     </figure>
 
                     <p>比如推荐餐厅：<code>餐厅 = [人均消费, 评分, 距离我当前位置]</code></p>
@@ -312,13 +312,13 @@
                             <line x1="20" y1="140" x2="260" y2="50" stroke="#3b82f6" stroke-width="5"/>
                             <line x1="20" y1="140" x2="220" y2="75" stroke="#10b981" stroke-width="2"/>
                             <line x1="20" y1="140" x2="130" y2="95" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 4"/>
-                            <text x="265" y="45" font-size="12" fill="#3b82f6">A（兴趣强）</text>
-                            <text x="225" y="70" font-size="12" fill="#10b981">B（热门）</text>
-                            <text x="100" y="90" font-size="12" fill="#f59e0b">C（一般）</text>
-                            <text x="60" y="155" font-size="12" fill="var(--text-secondary)">A×B：方向近且长度都大 → IP 很高</text>
-                            <text x="60" y="170" font-size="12" fill="var(--text-secondary)">A×C：方向近但长度小 → IP 较低</text>
+                            <text x="265" y="45" font-size="12" fill="#3b82f6">A=[0.9,0.3]</text>
+                            <text x="225" y="70" font-size="12" fill="#10b981">B=[0.7,0.2]</text>
+                            <text x="100" y="90" font-size="12" fill="#f59e0b">C=[0.2,0.07]</text>
+                            <text x="60" y="155" font-size="12" fill="var(--text-secondary)">A·B≈0.69，IP 很高</text>
+                            <text x="60" y="170" font-size="12" fill="var(--text-secondary)">A·C≈0.20，IP 较低</text>
                         </svg>
-                        <figcaption>IP = 方向相似度 × 长度 × 长度。A 和 B 方向接近且长度都大，IP 很高；A 和 C 方向也接近但 C 很短，IP 明显更低。</figcaption>
+                        <figcaption>IP = 方向相似度 × 长度 × 长度。例如 A=[0.9, 0.3]（兴趣强）与 B=[0.7, 0.2]（热门）的 IP ≈ 0.69；A 与 C=[0.2, 0.07]（兴趣弱）的 IP ≈ 0.20，明显更低。</figcaption>
                     </figure>
 
                     <ul>
