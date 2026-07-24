@@ -125,25 +125,91 @@
                 </div>
 
                 <h3>1.2 micrograd 的核心设计</h3>
-                <p>micrograd 用一个 <code>Value</code> 类代表一个标量。每个 Value 对象保存：</p>
-                <ul>
-                    <li><code>data</code>：标量的数值</li>
-                    <li><code>grad</code>：该标量对最终损失的梯度</li>
-                    <li><code>_prev</code>：产生这个 Value 的子节点集合</li>
-                    <li><code>_op</code>：生成这个 Value 的运算符</li>
-                    <li><code>label</code>：可读标签（可选）</li>
-                </ul>
+                <p>micrograd 用一个 <code>Value</code> 类代表一个标量。它不仅仅是一个数字，而是一个「会记录自己从哪里来、如何求导」的数字。</p>
 
                 <pre><code>class Value {
     constructor(data, _children=[], _op='', label='') {
-        this.data = data;
-        this.grad = 0.0;
-        this._backward = () => {};
-        this._prev = new Set(_children);
-        this._op = _op;
-        this.label = label;
+        this.data = data;                  // 当前标量的数值
+        this.grad = 0.0;                   // 最终损失对这个标量的梯度
+        this._backward = () => {};         // 一个闭包：如何把这个标量的梯度传回给子节点
+        this._prev = new Set(_children);   // 产生这个 Value 的子节点集合
+        this._op = _op;                    // 生成这个 Value 的运算符，如 +、*、**2
+        this.label = label;                // 可读标签，方便 debug 和可视化
     }
 }</code></pre>
+
+                <h4>字段详解</h4>
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🔢</span>data</div>
+                    <p><strong>含义：</strong>这个 Value 当前的数值。例如 <code>new Value(2.0)</code> 的 <code>data</code> 就是 2.0。</p>
+                    <p><strong>为什么需要：</strong>前向传播就是不断更新和组合这个字段，最终得到模型输出或损失值。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">📉</span>grad</div>
+                    <p><strong>含义：</strong>最终损失 <code>L</code> 对这个 Value 的偏导数，即 <code>∂L/∂this</code>。</p>
+                    <p><strong>为什么需要：</strong>训练模型时，我们需要知道「如果把这个值稍微改变一点，损失会怎么变」。grad 就是这个敏感度。</p>
+                    <p><strong>初始为什么是 0：</strong>在 <code>backward()</code> 之前，我们不知道任何梯度。backward() 会把根节点的 grad 设为 1，然后逐步填充其他节点。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">⬅️</span>_prev</div>
+                    <p><strong>含义：</strong>产生当前 Value 的子节点集合（也就是「这个值是由哪些值算出来的」）。</p>
+                    <p><strong>为什么需要：</strong>反向传播时要沿着这些边往回走。如果不知道父亲是谁，就无法把梯度传回去。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🔧</span>_op</div>
+                    <p><strong>含义：</strong>生成当前 Value 的运算符号，例如 <code>+</code>、<code>*</code>、<code>**2</code>。</p>
+                    <p><strong>为什么需要：</strong>画计算图时用来标注边，也帮助理解每个节点是怎么来的。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🏷️</span>label</div>
+                    <p><strong>含义：</strong>人类可读的标签，比如 'x'、'w1'、'loss'。</p>
+                    <p><strong>为什么需要：</strong>调试和可视化时方便识别节点。它不参与计算。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">🔄</span>_backward（最关键）</div>
+                    <p><strong>含义：</strong>一个闭包函数，描述了「已知当前节点的上游梯度，如何计算并累加子节点的梯度」。</p>
+                    <p><strong>为什么需要：</strong>每个运算的求导规则不同。_backward 把「这个运算怎么反向传播」封装起来，让 backward() 可以统一调用。</p>
+                    <p><strong>例子：</strong>如果 <code>c = a + b</code>，那么 c 的 _backward 会执行：<code>a.grad += c.grad; b.grad += c.grad;</code>。</p>
+                </div>
+
+                <h4>核心方法在做什么？</h4>
+                <table>
+                    <tr>
+                        <th>方法</th>
+                        <th>前向做什么</th>
+                        <th>反向做什么</th>
+                    </tr>
+                    <tr>
+                        <td><code>add(other)</code></td>
+                        <td>创建新 Value，data = this.data + other.data</td>
+                        <td>this.grad += out.grad; other.grad += out.grad</td>
+                    </tr>
+                    <tr>
+                        <td><code>mul(other)</code></td>
+                        <td>创建新 Value，data = this.data * other.data</td>
+                        <td>this.grad += other.data * out.grad; other.grad += this.data * out.grad</td>
+                    </tr>
+                    <tr>
+                        <td><code>pow(n)</code></td>
+                        <td>创建新 Value，data = this.data^n</td>
+                        <td>this.grad += n * this.data^(n-1) * out.grad</td>
+                    </tr>
+                    <tr>
+                        <td><code>tanh()</code> / <code>relu()</code></td>
+                        <td>应用激活函数得到新 Value</td>
+                        <td>乘上激活函数的局部导数</td>
+                    </tr>
+                    <tr>
+                        <td><code>backward()</code></td>
+                        <td>—</td>
+                        <td>拓扑排序后，从根节点开始反向调用每个节点的 _backward，填充所有 grad</td>
+                    </tr>
+                </table>
 
                 <h3>1.3 计算图长什么样？</h3>
                 <p>当你写下 <code>c = a + b</code> 时，micrograd 会创建三个 Value 节点：a、b、c，并在 a、b 和 c 之间连上两条边，标记运算符为 <code>+</code>。</p>
