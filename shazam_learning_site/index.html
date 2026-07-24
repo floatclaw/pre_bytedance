@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shazam 音频指纹学习指南</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/demos.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Shazam</div>
+                <div class="sidebar-subtitle">音频指纹学习指南</div>
+            </div>
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>学习进度</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="nav-section">目录</div>
+            <ul class="nav-list">
+                <li class="nav-item"><a href="#intro" class="nav-link">导学</a></li>
+                <li class="nav-item"><a href="#chapter1" class="nav-link">第 1 章：音频基础</a></li>
+                <li class="nav-item"><a href="#chapter2" class="nav-link">第 2 章：频谱峰值</a></li>
+                <li class="nav-item"><a href="#chapter3" class="nav-link">第 3 章：Landmark 指纹</a></li>
+                <li class="nav-item"><a href="#chapter4" class="nav-link">第 4 章：哈希与索引</a></li>
+                <li class="nav-item"><a href="#chapter5" class="nav-link">第 5 章：匹配原理</a></li>
+                <li class="nav-item"><a href="#chapter6" class="nav-link">第 6 章：完整流程</a></li>
+                <li class="nav-item"><a href="#chapter7" class="nav-link">第 7 章：优缺点与边界</a></li>
+                <li class="nav-item"><a href="#chapter8" class="nav-link">第 8 章：真实案例与面试题</a></li>
+                <li class="nav-item"><a href="#summary" class="nav-link">总结与延伸</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="top-bar">
+                <button class="menu-toggle" id="menuToggle">☰ 目录</button>
+                <button class="theme-toggle" id="themeToggle">🌙 暗色模式</button>
+            </div>
+
+            <!-- Hero -->
+            <section class="hero" id="intro">
+                <span class="hero-badge">零基础友好 · 可交互</span>
+                <h1>Shazam 音频指纹学习指南</h1>
+                <p>一步一步理解 Shazam 的 Landmark 音频指纹：从波形到时频图，从能量峰值到哈希索引，再到时间偏移投票匹配，最终动手实现一个可交互的听歌识曲 Demo。</p>
+                <div class="hero-actions">
+                    <a href="#chapter1" class="btn btn-primary">开始学习</a>
+                    <a href="#chapter8" class="btn btn-secondary">先看业务场景</a>
+                </div>
+            </section>
+
+            <!-- Roadmap -->
+            <h2>学习路线</h2>
+            <div class="roadmap">
+                <a href="#chapter1" class="roadmap-item">
+                    <div class="roadmap-number">1</div>
+                    <div class="roadmap-content">
+                        <h4>音频基础</h4>
+                        <p>波形、采样率、时频图、STFT</p>
+                    </div>
+                </a>
+                <a href="#chapter2" class="roadmap-item">
+                    <div class="roadmap-number">2</div>
+                    <div class="roadmap-content">
+                        <h4>频谱峰值</h4>
+                        <p>为什么只保留局部能量最大点</p>
+                    </div>
+                </a>
+                <a href="#chapter3" class="roadmap-item">
+                    <div class="roadmap-number">3</div>
+                    <div class="roadmap-content">
+                        <h4>Landmark 指纹</h4>
+                        <p>星座图与峰值稀疏表示</p>
+                    </div>
+                </a>
+                <a href="#chapter4" class="roadmap-item">
+                    <div class="roadmap-number">4</div>
+                    <div class="roadmap-content">
+                        <h4>哈希与索引</h4>
+                        <p>峰对组合哈希与倒排索引</p>
+                    </div>
+                </a>
+                <a href="#chapter5" class="roadmap-item">
+                    <div class="roadmap-number">5</div>
+                    <div class="roadmap-content">
+                        <h4>匹配原理</h4>
+                        <p>时间偏移投票与识别置信度</p>
+                    </div>
+                </a>
+                <a href="#chapter6" class="roadmap-item">
+                    <div class="roadmap-number">6</div>
+                    <div class="roadmap-content">
+                        <h4>完整流程</h4>
+                        <p>录音 → 预处理 → 指纹 → 检索 → 匹配</p>
+                    </div>
+                </a>
+                <a href="#chapter7" class="roadmap-item">
+                    <div class="roadmap-number">7</div>
+                    <div class="roadmap-content">
+                        <h4>优缺点与边界</h4>
+                        <p>噪声、翻唱、变速与神经网络方法对比</p>
+                    </div>
+                </a>
+                <a href="#chapter8" class="roadmap-item">
+                    <div class="roadmap-number">8</div>
+                    <div class="roadmap-content">
+                        <h4>真实案例与面试题</h4>
+                        <p>听歌识曲、广告监测、版权保护、面试 Q&A</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Chapter 1 -->
+            <section id="chapter1">
+                <h2>第 1 章：音频基础</h2>
+
+                <h3>1.1 音频是什么？</h3>
+                <p>我们听到的声音本质上是空气压力随时间的变化。数字音频就是把这种连续的声波，按固定时间间隔采样成一系列数字。</p>
+                <ul>
+                    <li><strong>采样率（Sample Rate）</strong>：每秒采多少个点。CD 音质是 44.1kHz，即每秒 44100 个样本。</li>
+                    <li><strong>位深（Bit Depth）</strong>：每个样本用多少位表示，决定动态范围。常见 16bit、24bit。</li>
+                    <li><strong>声道（Channel）</strong>：单声道、立体声、多声道。</li>
+                </ul>
+
+                <p>对 Shazam 来说，原始波形包含太多冗余信息。一段 10 秒的 44.1kHz 单声道音频就有 44.1 万个采样点。直接比较波形既不鲁棒也不高效。</p>
+
+                <h3>1.2 从波形到时频图</h3>
+                <p>人耳感知的是「某个时间有哪些频率在响」，而不是「某一时刻空气压力是多少」。所以 Shazam 先把波形转成<strong>时频图（spectrogram）</strong>：</p>
+
+                <ol>
+                    <li><strong>分帧</strong>：把音频切成几十毫秒的小段，每段称为一帧。</li>
+                    <li><strong>加窗</strong>：用 Hann 窗等减少帧边界的频谱泄漏。</li>
+                    <li><strong>傅里叶变换（STFT）</strong>：把每帧从时域转到频域，得到该帧内各频率的能量。</li>
+                </ol>
+
+                <div class="highlight-box">
+                    <p><strong>一句话</strong>：时频图告诉我们「在每一小段时间里，每个频率有多响」。横轴是时间，纵轴是频率，亮度是能量。</p>
+                </div>
+
+                <h3>1.3 为什么时频图更适合做指纹？</h3>
+                <ul>
+                    <li><strong>频率信息更稳定</strong>：一段旋律的音高、和声结构在时频图上表现为稳定的能量分布。</li>
+                    <li><strong>对时间偏移鲁棒</strong>：无论从歌曲哪一秒开始录音，时频结构只要对齐就能匹配。</li>
+                    <li><strong>可降维</strong>：不需要保留每个格子的值，只保留最强的那部分峰值即可。</li>
+                </ul>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>音频数字化依赖采样率和位深</li>
+                        <li>时频图通过 STFT 把音频表示成「时间 × 频率 × 能量」</li>
+                        <li>Shazam 不把原始波形当特征，而是使用时频图</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter1"></div>
+            </section>
+
+            <!-- Chapter 2 -->
+            <section id="chapter2">
+                <h2>第 2 章：频谱峰值</h2>
+
+                <h3>2.1 为什么只保留峰值？</h3>
+                <p>时频图仍然是一个很大的矩阵。Shazam 的关键洞察是：<strong>只保留局部能量最大的那些点</strong>，就足以识别一首歌。</p>
+
+                <p>这些峰值就像一首歌的「地标」：</p>
+                <ul>
+                    <li>它们是能量最突出的频率成分，不容易被背景噪声淹没</li>
+                    <li>即使录音质量差、有杂音，主要峰值的位置通常保持稳定</li>
+                    <li>峰值数量远小于时频图总格子数，数据量大幅压缩</li>
+                </ul>
+
+                <h3>2.2 如何提取峰值？</h3>
+                <p>找峰值需要两个条件：</p>
+
+                <ol>
+                    <li><strong>能量阈值</strong>：只有能量超过某个阈值的点才可能是峰值。</li>
+                    <li><strong>局部最大</strong>：在时间和频率的邻域内，该点的能量必须比周围所有点都高。</li>
+                </ol>
+
+                <pre><code>对于时频图中的每个格子 (t, f)：
+    如果 energy[t][f] < 阈值：跳过
+    如果在邻域内存在 energy[t+dt][f+df] >= energy[t][f]：跳过
+    否则：(t, f) 是一个峰值</code></pre>
+
+                <p><strong>邻域大小</strong>决定了峰值的「稀疏程度」。邻域越大，找到的峰值越少但越稳定；邻域越小，峰值越多但可能包含噪声点。</p>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">📊 频谱峰值提取器</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">拖动阈值滑块，观察合成时频图中哪些格子被识别为能量峰值。理解 Shazam 如何用稀疏峰值代替完整频谱。</div>
+                    <div id="spectrogram-peaks-demo"></div>
+                </div>
+
+                <h3>2.3 峰值的鲁棒性</h3>
+                <p>为什么峰值对噪声鲁棒？想象你在嘈杂的酒吧听歌：</p>
+                <ul>
+                    <li>人声、鼓点、贝斯等强能量成分仍然突出</li>
+                    <li>背景闲聊是随机噪声，不会系统性地替代原有强峰</li>
+                    <li>即使少数峰值丢失或新增少量伪峰，整体星座模式仍能被匹配</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p><strong>一句话</strong>：峰值是时频图的「骨架」，丢弃软组织后仍能辨认出歌曲的轮廓。</p>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>峰值必须同时满足能量阈值和局部最大两个条件</li>
+                        <li>提高阈值会让峰值数量减少</li>
+                        <li>峰值对噪声鲁棒，因为噪声不会系统性改变强峰位置</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter2"></div>
+            </section>
+
+            <!-- Chapter 3 -->
+            <section id="chapter3">
+                <h2>第 3 章：Landmark 指纹</h2>
+
+                <h3>3.1 从峰值到星座图</h3>
+                <p>把一首歌提取出的所有峰值画在「时间-频率」平面上，会得到一张稀疏的点图。因为形状像星空，所以被称为 <strong>星座图（constellation map）</strong>。</p>
+
+                <p>每个峰值点就是一个 <strong>landmark（地标）</strong>，它的坐标是：</p>
+                <ul>
+                    <li><code>t</code>：时间帧索引</li>
+                    <li><code>f</code>：频率 bin 索引</li>
+                    <li><code>energy</code>：该点的能量（可选）</li>
+                </ul>
+
+                <h3>3.2 为什么叫「指纹」？</h3>
+                <p>就像人的指纹由独特的纹路组成，每首歌的峰值星座图也有自己独特的时空分布。两首不同的歌，它们的 landmark 分布通常差异很大；同一首歌的不同片段，landmark 分布则高度一致。</p>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">✨ 星座图可视化</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">观察合成音频的 landmark 分布。试着加上噪声，看主要峰值结构是否仍然保留。</div>
+                    <div id="landmark-map-demo"></div>
+                </div>
+
+                <h3>3.3 Landmark 指纹的特点</h3>
+                <ul>
+                    <li><strong>稀疏</strong>：一首歌可能只有几千到几万个峰值点，远小于原始音频数据</li>
+                    <li><strong>局部</strong>：每个 landmark 只反映一小段时频区域的特征</li>
+                    <li><strong>可组合</strong>：多个 landmark 可以组合成哈希，用于快速索引</li>
+                </ul>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>星座图是峰值在时频平面上的可视化</li>
+                        <li>landmark 由（时间，频率）坐标定义</li>
+                        <li>不同歌曲的 landmark 分布通常差异明显</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter3"></div>
+            </section>
+
+            <!-- Chapter 4 -->
+            <section id="chapter4">
+                <h2>第 4 章：哈希与索引</h2>
+
+                <h3>4.1 从峰对到哈希</h3>
+                <p>光有 landmark 集合还不够：如果查询时直接把查询片段的峰值和数据库里每首歌的峰值逐一比对，速度太慢。Shazam 的做法是把局部峰对结构编码成<strong>哈希</strong>。</p>
+
+                <p>具体步骤：</p>
+                <ol>
+                    <li>选一个锚点峰（anchor peak）</li>
+                    <li>在它附近的固定时间窗口内，找若干目标峰（target peaks）</li>
+                    <li>对每个目标峰，计算：</li>
+                </ol>
+
+                <pre><code>hash = (anchorF, targetF, deltaT)
+       = 锚点频率 + 目标频率 + 两者时间差</code></pre>
+
+                <p>同一个锚点可以在窗口内与多个目标峰组合，因此一首歌的 landmark 能生成大量哈希。</p>
+
+                <h3>4.2 倒排索引</h3>
+                <p>数据库建库时，把所有歌曲的哈希存入一个<strong>倒排索引</strong>：</p>
+
+                <pre><code>hash_value → [ {songId, time}, {songId, time}, ... ]</code></pre>
+
+                <p>查询时，根据查询片段的哈希直接查到数据库中所有可能出现的位置，时间复杂度接近 O(1)。</p>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🔗 哈希与倒排索引</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">选择一个锚点峰，观察它与附近目标峰如何生成哈希，以及这些哈希如何被组织成倒排索引。</div>
+                    <div id="hash-index-demo"></div>
+                </div>
+
+                <h3>4.3 哈希设计的 trade-off</h3>
+                <table>
+                    <tr>
+                        <th>参数</th>
+                        <th>太大</th>
+                        <th>太小</th>
+                    </tr>
+                    <tr>
+                        <td>目标时间窗口</td>
+                        <td>哈希数量爆炸，索引变大</td>
+                        <td>峰对组合太少，匹配召回率低</td>
+                    </tr>
+                    <tr>
+                        <td>峰值阈值</td>
+                        <td>峰值太少，丢失结构</td>
+                        <td>峰值太多，引入噪声</td>
+                    </tr>
+                    <tr>
+                        <td>邻域大小</td>
+                        <td>峰值过密，计算量大</td>
+                        <td>峰值过疏，结构信息不足</td>
+                    </tr>
+                </table>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>Shazam 哈希通常由锚点频率、目标频率、时间差组成</li>
+                        <li>一个锚点可以与多个目标峰生成多个哈希</li>
+                        <li>倒排索引让哈希查找从「扫描全部歌曲」变成「直接定位候选」</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter4"></div>
+            </section>
+
+            <!-- Chapter 5 -->
+            <section id="chapter5">
+                <h2>第 5 章：匹配原理</h2>
+
+                <h3>5.1 查询片段如何匹配？</h3>
+                <p>当用户用手机录了一段音频，Shazam 也按同样的流程提取峰值、生成哈希。然后把这些查询哈希拿到数据库倒排索引里查。</p>
+
+                <p>如果查询片段确实来自某首歌，会发生什么？</p>
+                <ul>
+                    <li>查询中的很多哈希，会在数据库里找到相同的哈希值</li>
+                    <li>每个匹配哈希都带有一个数据库时间戳 <code>dbTime</code> 和查询时间戳 <code>qTime</code></li>
+                    <li>计算时间偏移：<code>offset = dbTime - qTime</code></li>
+                </ul>
+
+                <h3>5.2 时间偏移投票</h3>
+                <p>关键洞察：<strong>如果查询片段来自某首歌的真实片段，那么所有正确匹配的哈希对都应该共享同一个时间偏移</strong>。这个偏移就是查询片段在整首歌中的起始位置。</p>
+
+                <pre><code>对于每个匹配的哈希：
+    offset = dbTime - qTime
+    给 (songId, offset) 这个组合投一票
+
+最后统计每个 (songId, offset) 的票数
+得票最高的就是最佳匹配</code></pre>
+
+                <p>这就像一个「时间对齐」检测：噪声和错误匹配产生的 offset 是随机的，而真实匹配会集中在一个 offset 上，形成明显的峰值。</p>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🎯 匹配模拟器</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">预置一首「数据库歌曲」和一段「查询片段」，点击匹配后观察时间偏移投票直方图如何找出正确答案。</div>
+                    <div id="matching-simulator-demo"></div>
+                </div>
+
+                <h3>5.3 为什么从任意位置都能匹配？</h3>
+                <p>用户可能从歌曲开头、中间、副歌任意位置开始录音。无论起始位置在哪，所有正确匹配峰对的 <code>dbTime - qTime</code> 都会整体平移同一个常数。</p>
+
+                <p>例如：</p>
+                <ul>
+                    <li>如果查询从歌曲第 10 秒开始，offset 就约等于 10 秒</li>
+                    <li>如果从第 30 秒开始，offset 就约等于 30 秒</li>
+                </ul>
+
+                <p>投票机制会自动发现这个共同的 offset，不需要事先知道查询从哪开始。</p>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>匹配时计算 dbTime - qTime 作为时间偏移</li>
+                        <li>真实匹配的偏移会集中在一个值上，形成直方图峰值</li>
+                        <li>噪声和错误匹配的偏移是分散的</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter5"></div>
+            </section>
+
+            <!-- Chapter 6 -->
+            <section id="chapter6">
+                <h2>第 6 章：Shazam 完整流程</h2>
+
+                <h3>6.1 建库流程</h3>
+                <div class="process-flow">
+                    <span class="process-step">原始音频</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">预处理</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">时频图</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">峰值提取</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">峰对哈希</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">倒排索引</span>
+                </div>
+
+                <h3>6.2 查询流程</h3>
+                <div class="process-flow">
+                    <span class="process-step">用户录音</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">同样预处理</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">提取峰值</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">生成查询哈希</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">倒排检索</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">偏移投票</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">返回结果</span>
+                </div>
+
+                <h3>6.3 预处理细节</h3>
+                <ul>
+                    <li><strong>降采样</strong>：把 44.1kHz 降到 8kHz 或 11.025kHz，减少计算量同时保留人声和主要乐器信息</li>
+                    <li><strong>分帧</strong>：通常 32ms 一帧，帧移 50%</li>
+                    <li><strong>加 Hann 窗</strong>：减少频谱泄漏</li>
+                    <li><strong>STFT</strong>：得到时频表示</li>
+                </ul>
+
+                <h3>6.4 为什么查询和建库必须用同一套参数？</h3>
+                <p>只有完全相同的预处理、峰值提取和哈希参数，才能保证同一首歌曲在数据库和查询时生成可对齐的指纹。如果参数不同，同一个物理时间点可能对应不同的帧索引，匹配就失效了。</p>
+
+                <div class="highlight-box">
+                    <p><strong>一句话</strong>：Shazam = 同一套指纹算法 + 倒排索引 + 时间偏移投票。</p>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>建库和查询使用完全相同的指纹提取流程</li>
+                        <li>预处理包括降采样、分帧、加窗、STFT</li>
+                        <li>最终匹配依赖时间偏移投票直方图</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter6"></div>
+            </section>
+
+            <!-- Chapter 7 -->
+            <section id="chapter7">
+                <h2>第 7 章：优缺点与边界</h2>
+
+                <h3>7.1 Landmark 指纹的优势</h3>
+                <ul>
+                    <li><strong>计算轻量</strong>：峰值提取和哈希计算都很简单，适合移动端和实时识别</li>
+                    <li><strong>索引紧凑</strong>：倒排索引只存哈希到（歌曲，时间）的映射</li>
+                    <li><strong>对噪声鲁棒</strong>：随机噪声不会系统性地改变强峰位置</li>
+                    <li><strong>对压缩/失真鲁棒</strong>：MP3、AAC 压缩主要损失弱能量细节，强峰基本保留</li>
+                    <li><strong>无需训练</strong>：不需要神经网络或大量标注数据</li>
+                </ul>
+
+                <h3>7.2 Landmark 指纹的局限</h3>
+                <ul>
+                    <li><strong>对翻唱/变奏弱</strong>：不同歌手演唱、乐器改编会改变频谱结构</li>
+                    <li><strong>对变速/变调敏感</strong>：时间拉伸和音高改变会破坏峰对的时间差和频率</li>
+                    <li><strong>对极端噪声敏感</strong>：如果噪声完全淹没音乐，峰值结构会被破坏</li>
+                    <li><strong>只匹配录音</strong>：对哼唱识别效果差</li>
+                </ul>
+
+                <h3>7.3 与神经网络方法的对比</h3>
+                <table>
+                    <tr>
+                        <th>维度</th>
+                        <th>Landmark 指纹</th>
+                        <th>神经网络嵌入</th>
+                    </tr>
+                    <tr>
+                        <td>特征来源</td>
+                        <td> handcrafted 时频峰值</td>
+                        <td>数据驱动学习的高层语义嵌入</td>
+                    </tr>
+                    <tr>
+                        <td>是否需要训练</td>
+                        <td>不需要</td>
+                        <td>需要大量数据和算力</td>
+                    </tr>
+                    <tr>
+                        <td>对原录音</td>
+                        <td>非常强</td>
+                        <td>强</td>
+                    </tr>
+                    <tr>
+                        <td>对翻唱/变奏</td>
+                        <td>弱</td>
+                        <td>可训练得更强</td>
+                    </tr>
+                    <tr>
+                        <td>可解释性</td>
+                        <td>高，峰值和哈希都可视</td>
+                        <td>低，嵌入向量难直接解释</td>
+                    </tr>
+                    <tr>
+                        <td>计算成本</td>
+                        <td>低</td>
+                        <td>高（推理+索引）</td>
+                    </tr>
+                </table>
+
+                <h3>7.4 什么时候选 Landmark，什么时候选神经网络？</h3>
+                <ul>
+                    <li><strong>选 Landmark</strong>：需要快速、轻量、可解释、对同一录音识别的场景，如听歌识曲、广告监测、版权保护</li>
+                    <li><strong>选神经网络</strong>：需要理解旋律、风格、翻唱关系，如哼唱识别、cover song 检测、音乐推荐</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p><strong>一句话</strong>：Landmark 是「精确匹配录音」的专家；神经网络是「理解音乐语义」的通才。实际系统可以两者结合。</p>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>Landmark 对原录音、噪声、压缩鲁棒</li>
+                        <li>Landmark 对翻唱、变速、变调相对脆弱</li>
+                        <li>神经网络嵌入更适合语义层面的音乐理解</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter7"></div>
+            </section>
+
+            <!-- Chapter 8 -->
+            <section id="chapter8">
+                <h2>第 8 章：真实案例与面试题</h2>
+
+                <h3>8.1 真实案例</h3>
+                <div id="cases-container"></div>
+
+                <h3>8.2 面试高频题</h3>
+                <div id="interview-container"></div>
+
+                <div class="quiz-container" data-chapter="chapter8"></div>
+            </section>
+
+            <!-- Summary -->
+            <section id="summary">
+                <h2>总结与延伸</h2>
+
+                <h3>Shazam 完整流程</h3>
+                <div class="process-flow">
+                    <span class="process-step">录音/音频</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">预处理</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">时频图</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">峰值/星座图</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">峰对哈希</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">倒排索引</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">时间投票匹配</span>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">1️⃣</span>预处理</div>
+                    <p>降采样、分帧、加窗、STFT，把波形变成时频图。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">2️⃣</span>峰值提取</div>
+                    <p>保留局部能量最大点，形成稀疏的星座图 landmark。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">3️⃣</span>组合哈希</div>
+                    <p>用锚点-目标峰对生成（频率，频率，时间差）哈希。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">4️⃣</span>倒排索引</div>
+                    <p>把哈希映射到（歌曲ID，时间戳），实现快速检索。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">5️⃣</span>时间偏移投票</div>
+                    <p>对匹配哈希计算 dbTime - qTime，统计直方图峰值得到最佳匹配。</p>
+                </div>
+
+                <h3>核心要点回顾</h3>
+                <div class="comparison comparison-3">
+                    <div class="comparison-box">
+                        <h4>1. 时频图</h4>
+                        <p>把音频从「时间-振幅」变成「时间-频率-能量」，是提取指纹的基础。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>2. 峰值与哈希</h4>
+                        <p>只保留强峰，用峰对组合成紧凑哈希，大幅压缩数据并保留可匹配结构。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>3. 偏移投票</h4>
+                        <p>通过时间偏移直方图，把「像不像」变成可统计的票数问题。</p>
+                    </div>
+                </div>
+
+                <h3>延伸学习路径</h3>
+                <ul>
+                    <li><strong>信号处理</strong>：STFT、CQT、梅尔频谱、 Hann 窗与频谱泄漏</li>
+                    <li><strong>音频指纹论文</strong>：Shazam 原始论文《An Industrial-Strength Audio Search Algorithm》</li>
+                    <li><strong>神经网络音频识别</strong>：MusicNN、CoverHunter、ByteCover 等基于学习的方案</li>
+                    <li><strong>工程实践</strong>：大规模倒排索引、实时音频流处理、移动端推理优化</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p><strong>一句话总结</strong>：Shazam 把「听音识曲」这个直觉问题，变成了一套可工程化、可扩展的指纹提取 + 哈希索引 + 时间投票流程。</p>
+                </div>
+
+                <div class="quiz-container" data-chapter="summary"></div>
+
+                <div class="footer">
+                    <p>基于 Shazam 音频指纹学习整理 | 可离线打开复习</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/cases.js"></script>
+    <script src="js/demos/spectrogram-peaks.js"></script>
+    <script src="js/demos/landmark-map.js"></script>
+    <script src="js/demos/hash-index.js"></script>
+    <script src="js/demos/matching-simulator.js"></script>
+</body>
+</html>
