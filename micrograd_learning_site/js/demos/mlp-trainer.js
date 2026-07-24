@@ -16,6 +16,8 @@
     let learningRate = 0.1;
     let activation = 'tanh';
     let isTraining = false;
+    let animationId = null;
+    let animationStepsRemaining = 0;
 
     function init() {
         container.innerHTML = `
@@ -39,6 +41,7 @@
                 <button class="btn btn-primary" id="mt-init">初始化</button>
                 <button class="btn btn-primary" id="mt-step10">训练 10 步</button>
                 <button class="btn btn-primary" id="mt-step100">训练 100 步</button>
+                <button class="btn btn-primary" id="mt-animate">动画训练 50 步</button>
                 <button class="btn btn-secondary" id="mt-reset">重置</button>
             </div>
             <div class="demo-grid-2">
@@ -73,6 +76,7 @@
 
         document.getElementById('mt-step10').addEventListener('click', () => train(10));
         document.getElementById('mt-step100').addEventListener('click', () => train(100));
+        document.getElementById('mt-animate').addEventListener('click', () => animateTrain(50));
         document.getElementById('mt-reset').addEventListener('click', reset);
 
         dataset = MGUtils.generateMoons(80, 0.15);
@@ -80,6 +84,12 @@
     }
 
     function reset() {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+        animationStepsRemaining = 0;
+        isTraining = false;
         dataset = MGUtils.generateMoons(80, 0.15);
         lossHistory = [];
         initModel();
@@ -93,6 +103,32 @@
         updateOutput('模型已初始化。隐藏层大小：' + hiddenSize + '，激活函数：' + activation);
     }
 
+    function trainOneStep() {
+        let totalLoss = new MGUtils.Value(0.0);
+        let n = 0;
+        for (const point of dataset.points) {
+            const x = [new MGUtils.Value(point.x), new MGUtils.Value(point.y)];
+            const pred = model.forward(x);
+            const label = new MGUtils.Value(point.label * 2 - 1);
+            const diff = label.sub(pred);
+            const loss = diff.pow(2);
+            totalLoss = totalLoss.add(loss);
+            n++;
+        }
+
+        const avgLoss = totalLoss.mul(1.0 / n);
+
+        model.parameters().forEach(p => p.grad = 0.0);
+        avgLoss.backward();
+
+        model.parameters().forEach(p => {
+            p.data -= learningRate * p.grad;
+        });
+
+        lossHistory.push(avgLoss.data);
+        if (lossHistory.length > 200) lossHistory.shift();
+    }
+
     function train(steps) {
         if (isTraining) return;
         isTraining = true;
@@ -102,29 +138,7 @@
 
         setTimeout(() => {
             for (let step = 0; step < steps; step++) {
-                let totalLoss = new MGUtils.Value(0.0);
-                let n = 0;
-                for (const point of dataset.points) {
-                    const x = [new MGUtils.Value(point.x), new MGUtils.Value(point.y)];
-                    const pred = model.forward(x);
-                    const label = new MGUtils.Value(point.label * 2 - 1);
-                    const diff = label.sub(pred);
-                    const loss = diff.pow(2);
-                    totalLoss = totalLoss.add(loss);
-                    n++;
-                }
-
-                const avgLoss = totalLoss.mul(1.0 / n);
-
-                model.parameters().forEach(p => p.grad = 0.0);
-                avgLoss.backward();
-
-                model.parameters().forEach(p => {
-                    p.data -= learningRate * p.grad;
-                });
-
-                lossHistory.push(avgLoss.data);
-                if (lossHistory.length > 200) lossHistory.shift();
+                trainOneStep();
             }
 
             draw();
@@ -132,6 +146,31 @@
             updateOutput(`完成 ${steps} 步训练。当前损失：${lastLoss.toFixed(4)}，总步数：${lossHistory.length}`);
             isTraining = false;
         }, 10);
+    }
+
+    function animateTrain(totalSteps) {
+        if (isTraining || animationStepsRemaining > 0) return;
+        animationStepsRemaining = totalSteps;
+        updateOutput('动画训练中...');
+
+        function step() {
+            if (animationStepsRemaining <= 0) {
+                isTraining = false;
+                const lastLoss = lossHistory[lossHistory.length - 1];
+                updateOutput(`动画训练完成。当前损失：${lastLoss.toFixed(4)}，总步数：${lossHistory.length}`);
+                return;
+            }
+
+            isTraining = true;
+            trainOneStep();
+            animationStepsRemaining--;
+            draw();
+            const lastLoss = lossHistory[lossHistory.length - 1];
+            updateOutput(`动画训练：第 ${totalSteps - animationStepsRemaining} / ${totalSteps} 步，损失 ${lastLoss.toFixed(4)}`);
+            animationId = requestAnimationFrame(() => setTimeout(step, 50));
+        }
+
+        step();
     }
 
     function updateOutput(text) {

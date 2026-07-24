@@ -374,7 +374,16 @@ d.backward();
                     <div id="mg-activation-functions-demo"></div>
                 </div>
 
-                <div class="concept-check">
+                
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🔬 神经元解剖图</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">拖动输入、权重和偏置，观察一个神经元如何计算加权求和并通过激活函数。</div>
+                    <div id="mg-neuron-anatomy-demo"></div>
+                </div>
+<div class="concept-check">
                     <h4>概念检查</h4>
                     <ol>
                         <li>没有激活函数，多层网络等价于单层线性变换</li>
@@ -434,7 +443,16 @@ MLP(nin, nouts)  → 多层 Layer，最后一层通常不用激活函数</code><
                     <div id="mg-mlp-trainer-demo"></div>
                 </div>
 
-                <div class="concept-check">
+                
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">⛰️ 梯度下降可视化</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">观察 SGD 如何沿着损失函数的负梯度方向，一步步下降到最低点。</div>
+                    <div id="mg-gradient-descent-demo"></div>
+                </div>
+<div class="concept-check">
                     <h4>概念检查</h4>
                     <ol>
                         <li>MLP = 多层 Layer，Layer = 多个 Neuron</li>
@@ -542,6 +560,8 @@ MLP(nin, nouts)  → 多层 Layer，最后一层通常不用激活函数</code><
     <script src="js/demos/computational-graph.js"></script>
     <script src="js/demos/scalar-autodiff.js"></script>
     <script src="js/demos/activation-functions.js"></script>
+    <script src="js/demos/neuron-anatomy.js"></script>
+    <script src="js/demos/gradient-descent.js"></script>
     <script src="js/demos/mlp-trainer.js"></script>
 </body>
 </html>
