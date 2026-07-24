@@ -1,0 +1,113 @@
+.demo-container {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 24px 0;
+    box-shadow: var(--shadow);
+}
+
+.demo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.demo-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.demo-badge {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: var(--accent-light);
+    color: var(--accent-dark);
+    font-weight: 600;
+}
+
+.demo-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+}
+
+.demo-controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.demo-control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.demo-control-group label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.demo-control-group select,
+.demo-control-group input[type="range"],
+.demo-control-group input[type="number"] {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.demo-canvas {
+    width: 100%;
+    border-radius: 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+}
+
+.demo-output {
+    margin-top: 16px;
+    padding: 16px;
+    background: var(--bg-primary);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    font-family: "Menlo", "Monaco", "Courier New", monospace;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    min-height: 60px;
+}
+
+.demo-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.demo-panel {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.demo-panel h4 {
+    margin-top: 0;
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .demo-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}

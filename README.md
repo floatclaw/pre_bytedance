@@ -4,9 +4,13 @@
 
 - **ByteCover3**：翻唱歌曲识别论文学习网站 + Python Demo
 - **Milvus**：向量数据库学习网站
+- **Shazam**：音频指纹（Landmark 指纹）学习网站
+- **micrograd**：标量自动微分与神经网络学习网站
 
 > ByteCover3 核心解决「用十几秒的短视频片段，从海量歌曲中找到它的翻唱原曲」。
 > Milvus 核心解决「如何高效存储和检索高维向量，实现语义搜索」。
+> Shazam 核心解决「用一段短录音快速识别出对应的歌曲」。
+> micrograd 核心解决「从零理解自动微分、反向传播和神经网络训练」。
 
 ---
 
@@ -17,6 +21,8 @@ bytedance/
 ├── bytecover3_site/          # 翻唱识别交互式课程网站
 ├── bytecover3_demo/          # 简化版 Python Demo
 ├── milvus_learning_site/     # Milvus 向量数据库交互式课程网站
+├── shazam_learning_site/     # Shazam 音频指纹交互式课程网站
+├── micrograd_learning_site/  # micrograd 自动微分与神经网络交互式课程网站
 └── BYTECOVER3- ACCURATE COVER SONG IDENTIFICATION ON SHORT QUERIES.pdf
                               # 原始论文
 ```
@@ -118,6 +124,79 @@ python3 -m http.server 8080
 
 ---
 
+### 4. `shazam_learning_site/` — Shazam 音频指纹交互式课程网站
+
+基于 ByteCover3 / Milvus 网站模板构建，专门用于学习 Shazam 的 Landmark 音频指纹算法。
+
+**内容结构：**
+- 导学：什么是音频指纹
+- 第 1 章：音频基础（波形、采样率、时频图、STFT）
+- 第 2 章：频谱峰值（局部最大值、阈值、邻域）
+- 第 3 章：Landmark 指纹与星座图
+- 第 4 章：哈希与倒排索引
+- 第 5 章：匹配原理（时间偏移投票）
+- 第 6 章：Shazam 完整流程
+- 第 7 章：优缺点与边界
+- 第 8 章：真实案例与面试题
+- 总结与延伸
+
+**交互 Demo：**
+- 频谱峰值提取器
+- 星座图可视化
+- 哈希与倒排索引
+- 匹配模拟器
+
+**如何打开：**
+
+```bash
+cd shazam_learning_site
+python3 -m http.server 8080
+```
+
+然后访问 http://localhost:8080
+
+也可以直接双击 `index.html` 离线打开。
+
+详见 [`shazam_learning_site/README.md`](shazam_learning_site/README.md)。
+
+---
+
+### 5. `micrograd_learning_site/` — micrograd 自动微分与神经网络交互式课程网站
+
+基于全新代码实现，专门用于学习 Andrej Karpathy 的 micrograd 项目。
+
+**内容结构：**
+- 导学：自动微分与从零实现神经网络
+- 第 1 章：Value 对象与计算图
+- 第 2 章：前向传播
+- 第 3 章：反向传播
+- 第 4 章：链式法则与拓扑排序
+- 第 5 章：激活函数（Tanh / Sigmoid / ReLU）
+- 第 6 章：神经网络与训练（MLP、SGD、Moon 数据集）
+- 第 7 章：真实案例与面试题
+- 总结与延伸
+
+**交互 Demo：**
+- 计算图可视化
+- 标量自动微分 playground
+- 激活函数探索器
+- MLP Moon 分类器
+
+**如何打开：**
+
+```bash
+cd micrograd_learning_site
+python3 -m http.server 8080
+```
+
+然后访问 http://localhost:8080
+
+也可以直接双击 `index.html` 离线打开。
+
+详见 [`micrograd_learning_site/README.md`](micrograd_learning_site/README.md)。
+
+---
+
 ## 学习建议
 
 1. **先看网站**：按章节顺序阅读，配合交互 Demo 理解概念。
@@ -137,7 +216,7 @@ python3 -m http.server 8080
 
 ## 离线使用
 
-本项目没有任何外部 CDN 依赖，所有 CSS、JS、图片都是本地文件。把整个目录复制到任何地方，双击 `bytecover3_site/index.html` 或 `milvus_learning_site/index.html` 即可离线学习。
+本项目没有任何外部 CDN 依赖，所有 CSS、JS、图片都是本地文件。把整个目录复制到任何地方，双击 `bytecover3_site/index.html`、`milvus_learning_site/index.html`、`shazam_learning_site/index.html` 或 `micrograd_learning_site/index.html` 即可离线学习。
 
 ---
 

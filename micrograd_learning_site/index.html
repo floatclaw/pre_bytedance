@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>micrograd 零基础学习指南</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/demos.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">micrograd</div>
+                <div class="sidebar-subtitle">零基础学习指南</div>
+            </div>
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>学习进度</span>
+                    <span id="progressText">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="nav-section">目录</div>
+            <ul class="nav-list">
+                <li class="nav-item"><a href="#intro" class="nav-link">导学</a></li>
+                <li class="nav-item"><a href="#chapter1" class="nav-link">第 1 章：Value 与计算图</a></li>
+                <li class="nav-item"><a href="#chapter2" class="nav-link">第 2 章：前向传播</a></li>
+                <li class="nav-item"><a href="#chapter3" class="nav-link">第 3 章：反向传播</a></li>
+                <li class="nav-item"><a href="#chapter4" class="nav-link">第 4 章：链式法则与拓扑排序</a></li>
+                <li class="nav-item"><a href="#chapter5" class="nav-link">第 5 章：激活函数</a></li>
+                <li class="nav-item"><a href="#chapter6" class="nav-link">第 6 章：神经网络与训练</a></li>
+                <li class="nav-item"><a href="#chapter7" class="nav-link">第 7 章：真实案例与面试题</a></li>
+                <li class="nav-item"><a href="#summary" class="nav-link">总结与延伸</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="top-bar">
+                <button class="menu-toggle" id="menuToggle">☰ 目录</button>
+                <button class="theme-toggle" id="themeToggle">🌙 暗色模式</button>
+            </div>
+
+            <!-- Hero -->
+            <section class="hero" id="intro">
+                <span class="hero-badge">零基础友好 · 可交互</span>
+                <h1>micrograd 学习指南</h1>
+                <p>从零开始理解 Andrej Karpathy 的 micrograd：一个只有约 150 行代码的标量自动微分引擎 + 神经网络库。学完后，你会真正明白反向传播、计算图和 PyTorch autograd 的底层原理。</p>
+                <div class="hero-actions">
+                    <a href="#chapter1" class="btn btn-primary">开始学习</a>
+                    <a href="#chapter6" class="btn btn-secondary">先看训练 Demo</a>
+                </div>
+            </section>
+
+            <!-- Roadmap -->
+            <h2>学习路线</h2>
+            <div class="roadmap">
+                <a href="#chapter1" class="roadmap-item">
+                    <div class="roadmap-number">1</div>
+                    <div class="roadmap-content">
+                        <h4>Value 与计算图</h4>
+                        <p>标量 Value 对象如何构建计算图</p>
+                    </div>
+                </a>
+                <a href="#chapter2" class="roadmap-item">
+                    <div class="roadmap-number">2</div>
+                    <div class="roadmap-content">
+                        <h4>前向传播</h4>
+                        <p>从输入计算输出，记录运算关系</p>
+                    </div>
+                </a>
+                <a href="#chapter3" class="roadmap-item">
+                    <div class="roadmap-number">3</div>
+                    <div class="roadmap-content">
+                        <h4>反向传播</h4>
+                        <p>从输出回传梯度到每个参数</p>
+                    </div>
+                </a>
+                <a href="#chapter4" class="roadmap-item">
+                    <div class="roadmap-number">4</div>
+                    <div class="roadmap-content">
+                        <h4>链式法则与拓扑排序</h4>
+                        <p>为什么梯度要这样累加</p>
+                    </div>
+                </a>
+                <a href="#chapter5" class="roadmap-item">
+                    <div class="roadmap-number">5</div>
+                    <div class="roadmap-content">
+                        <h4>激活函数</h4>
+                        <p>Tanh、Sigmoid、ReLU 与死神经元</p>
+                    </div>
+                </a>
+                <a href="#chapter6" class="roadmap-item">
+                    <div class="roadmap-number">6</div>
+                    <div class="roadmap-content">
+                        <h4>神经网络与训练</h4>
+                        <p>MLP、SGD、Moon 二分类</p>
+                    </div>
+                </a>
+                <a href="#chapter7" class="roadmap-item">
+                    <div class="roadmap-number">7</div>
+                    <div class="roadmap-content">
+                        <h4>真实案例与面试题</h4>
+                        <p>PyTorch 对比、调试技巧、面试 Q&A</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Chapter 1 -->
+            <section id="chapter1">
+                <h2>第 1 章：Value 对象与计算图</h2>
+
+                <h3>1.1 为什么需要自动微分？</h3>
+                <p>训练神经网络时，我们需要不断调整参数（权重和偏置），让模型的预测越来越接近真实答案。调整的依据就是<strong>梯度</strong>：损失函数对每个参数的偏导数。</p>
+                <p>手动计算这些梯度非常繁琐，尤其是网络很深、参数很多的时候。<strong>自动微分（autograd）</strong>就是自动帮你算这些偏导数的工具。</p>
+
+                <div class="highlight-box">
+                    <p><strong>一句话</strong>：自动微分让「求损失对百万参数的偏导」这件事变得自动化、可扩展。</p>
+                </div>
+
+                <h3>1.2 micrograd 的核心设计</h3>
+                <p>micrograd 用一个 <code>Value</code> 类代表一个标量。每个 Value 对象保存：</p>
+                <ul>
+                    <li><code>data</code>：标量的数值</li>
+                    <li><code>grad</code>：该标量对最终损失的梯度</li>
+                    <li><code>_prev</code>：产生这个 Value 的子节点集合</li>
+                    <li><code>_op</code>：生成这个 Value 的运算符</li>
+                    <li><code>label</code>：可读标签（可选）</li>
+                </ul>
+
+                <pre><code>class Value {
+    constructor(data, _children=[], _op='', label='') {
+        this.data = data;
+        this.grad = 0.0;
+        this._backward = () => {};
+        this._prev = new Set(_children);
+        this._op = _op;
+        this.label = label;
+    }
+}</code></pre>
+
+                <h3>1.3 计算图长什么样？</h3>
+                <p>当你写下 <code>c = a + b</code> 时，micrograd 会创建三个 Value 节点：a、b、c，并在 a、b 和 c 之间连上两条边，标记运算符为 <code>+</code>。</p>
+                <p>更复杂的表达式会形成更大的<strong>有向无环图（DAG）</strong>。这个图就是自动微分的基础：前向传播计算数值，反向传播沿着图的边回传梯度。</p>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🕸️ 计算图可视化</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">观察一个固定表达式如何被表示成计算图，并逐步执行前向传播与反向传播。</div>
+                    <div id="mg-computational-graph-demo"></div>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>Value 对象同时保存数值和梯度</li>
+                        <li><code>_prev</code> 用于构建计算图</li>
+                        <li>计算图是有向无环图（DAG）</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter1"></div>
+            </section>
+
+            <!-- Chapter 2 -->
+            <section id="chapter2">
+                <h2>第 2 章：前向传播</h2>
+
+                <h3>2.1 什么是前向传播？</h3>
+                <p><strong>前向传播</strong>就是从输入开始，沿着计算图逐层计算出最终输出的过程。同时，它还会记录每个 Value 是如何由其他 Value 计算得到的。</p>
+
+                <p>以 <code>c = a * b</code> 为例：</p>
+                <ol>
+                    <li>创建 a 和 b 两个 Value</li>
+                    <li>调用 <code>a.mul(b)</code>，得到 c，c.data = a.data * b.data</li>
+                    <li>c 的 <code>_prev</code> 包含 a 和 b，<code>_op</code> 是 <code>*</code></li>
+                    <li>c 还保存一个 <code>_backward</code> 闭包，稍后用来自动求梯度</li>
+                </ol>
+
+                <pre><code>const a = new Value(2.0);
+const b = new Value(3.0);
+const c = a.mul(b);  // c.data = 6.0
+const d = c.add(a);  // d.data = 8.0</code></pre>
+
+                <h3>2.2 每个运算都携带局部导数</h3>
+                <p>前向传播时，每个运算不仅算出结果，还「预埋」了如何反向求导的逻辑。这就是 <code>_backward</code> 闭包的作用。</p>
+
+                <table>
+                    <tr>
+                        <th>运算</th>
+                        <th>前向</th>
+                        <th>反向（局部导数）</th>
+                    </tr>
+                    <tr>
+                        <td>加法 c = a + b</td>
+                        <td>c.data = a.data + b.data</td>
+                        <td>a.grad += c.grad; b.grad += c.grad</td>
+                    </tr>
+                    <tr>
+                        <td>乘法 c = a * b</td>
+                        <td>c.data = a.data * b.data</td>
+                        <td>a.grad += b.data * c.grad; b.grad += a.data * c.grad</td>
+                    </tr>
+                    <tr>
+                        <td>幂次 c = a^n</td>
+                        <td>c.data = a.data^n</td>
+                        <td>a.grad += n * a.data^(n-1) * c.grad</td>
+                    </tr>
+                </table>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🔢 标量自动微分 playground</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">选择表达式，拖动 x、y 滑块，实时观察前向值和反向传播后的梯度。</div>
+                    <div id="mg-scalar-autodiff-demo"></div>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>前向传播计算数值并记录运算关系</li>
+                        <li>每个运算都预埋了反向传播的局部导数</li>
+                        <li>乘法 c=a*b 中，a 的局部导数是 b.data</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter2"></div>
+            </section>
+
+            <!-- Chapter 3 -->
+            <section id="chapter3">
+                <h2>第 3 章：反向传播</h2>
+
+                <h3>3.1 反向传播的本质</h3>
+                <p><strong>反向传播</strong>（Backpropagation）是从最终输出（通常是损失）出发，沿着计算图把梯度传回给每一个参数的过程。</p>
+
+                <p>在 micrograd 中，调用 <code>loss.backward()</code> 会触发三个步骤：</p>
+                <ol>
+                    <li><strong>拓扑排序</strong>：把所有节点按依赖顺序排好，确保每个节点在其子节点之后处理</li>
+                    <li><strong>根节点梯度置 1</strong>：损失对自己的导数是 1</li>
+                    <li><strong>反向遍历调用 _backward</strong>：从根节点开始，逐个调用每个节点预埋的反向传播闭包</li>
+                </ol>
+
+                <pre><code>backward() {
+    const topo = [];
+    const visited = new Set();
+
+    function build(v) {
+        if (!visited.has(v)) {
+            visited.add(v);
+            v._prev.forEach(build);
+            topo.push(v);
+        }
+    }
+    build(this);
+
+    this.grad = 1.0;
+    for (let i = topo.length - 1; i >= 0; i--) {
+        topo[i]._backward();
+    }
+}</code></pre>
+
+                <h3>3.2 梯度如何传递？</h3>
+                <p>每个节点收到上游梯度后，乘以自己这一层的局部导数，再分发给下游节点。这就是<strong>链式法则</strong>。</p>
+
+                <p>例如，如果 <code>y = f(g(x))</code>，那么：</p>
+                <pre><code>dy/dx = dy/dg * dg/dx</code></pre>
+
+                <p>在计算图中，<code>dy/dg</code> 是上游梯度，<code>dg/dx</code> 是局部导数，两者相乘就得到传给 x 的梯度。</p>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>反向传播从最终输出开始，向输入回传梯度</li>
+                        <li>拓扑排序确保处理顺序正确</li>
+                        <li>每个节点把上游梯度乘以局部导数再传给子节点</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter3"></div>
+            </section>
+
+            <!-- Chapter 4 -->
+            <section id="chapter4">
+                <h2>第 4 章：链式法则与拓扑排序</h2>
+
+                <h3>4.1 多路径梯度累加</h3>
+                <p>当一个 Value 被多个运算使用时，它会对最终输出产生多条路径的贡献。反向传播时，这些贡献要<strong>累加</strong>，而不是覆盖。</p>
+
+                <pre><code>const a = new Value(2.0);
+const b = a.add(1);  // b = a + 1
+const c = a.add(2);  // c = a + 2
+const d = b.mul(c);  // d = b * c
+
+// 反向传播后，a.grad 应该包含两条路径的贡献
+d.backward();
+// a.grad = dc/da 经过 b 的贡献 + 经过 c 的贡献</code></pre>
+
+                <p>这就是为什么 micrograd 的 _backward 使用 <code>+=</code> 而不是 <code>=</code>。PyTorch 中也一样，所以每次 backward 前要 <code>zero_grad()</code>。</p>
+
+                <h3>4.2 拓扑排序的作用</h3>
+                <p>计算图是一个有向无环图（DAG）。反向传播必须按照「先子节点、后父节点」的顺序进行，否则梯度还没算完就被使用了。</p>
+
+                <p>拓扑排序正好给出这个顺序。micrograd 用递归深度优先遍历实现：</p>
+                <ul>
+                    <li>访问一个节点前，先递归访问它的所有子节点</li>
+                    <li>等所有子节点都进入 topo 数组后，再把当前节点加入</li>
+                    <li>反向遍历 topo 数组，就是从根到叶子的正确顺序</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p><strong>一句话</strong>：拓扑排序让反向传播像「多米诺骨牌」一样，从输出一层层倒推到输入。</p>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>多路径贡献的梯度要累加</li>
+                        <li>拓扑排序保证反向传播顺序正确</li>
+                        <li>每次训练前清零梯度是为了避免历史梯度干扰</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter4"></div>
+            </section>
+
+            <!-- Chapter 5 -->
+            <section id="chapter5">
+                <h2>第 5 章：激活函数</h2>
+
+                <h3>5.1 为什么需要非线性？</h3>
+                <p>假设神经网络只有线性运算：</p>
+                <pre><code>y = W2 * (W1 * x + b1) + b2</code></pre>
+                <p>无论堆多少层，它都等价于一个线性变换 <code>y = W * x + b</code>。这样的网络只能拟合直线，无法处理弯曲的决策边界。</p>
+
+                <p><strong>激活函数</strong>在神经元输出后引入非线性，让网络能够逼近任意复杂函数。</p>
+
+                <h3>5.2 常见激活函数</h3>
+
+                <div class="comparison comparison-3">
+                    <div class="comparison-box">
+                        <h4>Tanh</h4>
+                        <p><code>tan(x) = (e^x - e^{-x}) / (e^x + e^{-x})</code></p>
+                        <p>输出范围 (-1, 1)，零中心化。两端会饱和，梯度接近 0。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>Sigmoid</h4>
+                        <p><code>σ(x) = 1 / (1 + e^{-x})</code></p>
+                        <p>输出范围 (0, 1)，适合概率解释。同样存在饱和问题。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>ReLU</h4>
+                        <p><code>ReLU(x) = max(0, x)</code></p>
+                        <p>计算简单，正区间梯度恒为 1。负区间梯度为 0，可能导致死神经元。</p>
+                    </div>
+                </div>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">📈 激活函数探索器</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">拖动输入点，观察 Tanh、Sigmoid、ReLU 的输出值和导数值。</div>
+                    <div id="mg-activation-functions-demo"></div>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>没有激活函数，多层网络等价于单层线性变换</li>
+                        <li>Tanh/Sigmoid 会饱和，导致梯度消失</li>
+                        <li>ReLU 简单高效，但可能造成死神经元</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter5"></div>
+            </section>
+
+            <!-- Chapter 6 -->
+            <section id="chapter6">
+                <h2>第 6 章：神经网络与训练</h2>
+
+                <h3>6.1 从 Neuron 到 MLP</h3>
+                <p>micrograd 的 <code>nn.py</code> 用三个类搭建神经网络：</p>
+
+                <pre><code>Neuron(nin)      → 接收 nin 个输入，计算加权求和 + 偏置，再经过激活函数
+Layer(nin, nout) → nout 个 Neuron
+MLP(nin, nouts)  → 多层 Layer，最后一层通常不用激活函数</code></pre>
+
+                <p>每个 <code>Module</code> 都有 <code>parameters()</code> 方法，收集所有权重和偏置。训练时，优化器只更新这些参数。</p>
+
+                <h3>6.2 训练循环</h3>
+                <p>一个完整的训练步骤包括：</p>
+
+                <ol>
+                    <li><strong>采样</strong>：取一个或一小批训练样本</li>
+                    <li><strong>前向</strong>：计算模型输出和损失</li>
+                    <li><strong>反向</strong>：调用 loss.backward() 求梯度</li>
+                    <li><strong>更新</strong>：用 SGD 按负梯度方向调整参数</li>
+                    <li><strong>清零</strong>：把 grad 置 0，准备下一轮</li>
+                </ol>
+
+                <pre><code>for epoch in range(100):
+    # 前向
+    loss = compute_loss(model, X, y)
+    # 反向
+    model.parameters().forEach(p => p.grad = 0);  // zero_grad
+    loss.backward();
+    # 更新
+    model.parameters().forEach(p => {
+        p.data -= learning_rate * p.grad;
+    });
+}</code></pre>
+
+                <h3>6.3 Moon 数据集二分类</h3>
+                <p>micrograd 的 demo.ipynb 用合成的 2D Moon 数据集训练一个二层 MLP。数据集由两个弯曲的半月形组成，需要用非线性模型才能分开。</p>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🌙 MLP Moon 分类器</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">调整隐藏层大小、学习率和激活函数，观察 MLP 如何学习 Moon 数据集的决策边界。</div>
+                    <div id="mg-mlp-trainer-demo"></div>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>MLP = 多层 Layer，Layer = 多个 Neuron</li>
+                        <li>训练循环：前向 → 反向 → 更新 → 清零</li>
+                        <li>SGD 沿负梯度方向更新参数</li>
+                    </ol>
+                </div>
+
+                <div class="quiz-container" data-chapter="chapter6"></div>
+            </section>
+
+            <!-- Chapter 7 -->
+            <section id="chapter7">
+                <h2>第 7 章：真实案例与面试题</h2>
+
+                <h3>7.1 真实案例</h3>
+                <div id="cases-container"></div>
+
+                <h3>7.2 面试高频题</h3>
+                <div id="interview-container"></div>
+
+                <div class="quiz-container" data-chapter="chapter7"></div>
+            </section>
+
+            <!-- Summary -->
+            <section id="summary">
+                <h2>总结与延伸</h2>
+
+                <h3>micrograd 完整流程</h3>
+                <div class="process-flow">
+                    <span class="process-step">定义 Value</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">构建计算图</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">前向传播</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">拓扑排序</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">反向传播</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">SGD 更新</span>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">1️⃣</span>Value 与计算图</div>
+                    <p>用 Value 对象表示标量，通过 <code>_prev</code> 和 <code>_op</code> 构建动态计算图。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">2️⃣</span>前向传播</div>
+                    <p>从输入开始逐层计算输出，每个运算预埋反向传播闭包。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">3️⃣</span>反向传播</div>
+                    <p>拓扑排序后从根节点反向遍历，用链式法则把梯度传回叶子节点。</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title"><span class="card-icon">4️⃣</span>神经网络与训练</div>
+                    <p>用 Neuron / Layer / MLP 搭建网络，通过 SGD 迭代优化参数。</p>
+                </div>
+
+                <h3>核心要点回顾</h3>
+                <div class="comparison comparison-3">
+                    <div class="comparison-box">
+                        <h4>1. 自动微分</h4>
+                        <p>把手动求导变成自动过程，让训练深层网络成为可能。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>2. 链式法则</h4>
+                        <p>反向传播的数学基础，把复杂导数拆成局部导数的乘积。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>3. 拓扑排序</h4>
+                        <p>保证反向传播按正确依赖顺序执行。</p>
+                    </div>
+                </div>
+
+                <h3>延伸学习路径</h3>
+                <ul>
+                    <li><strong>PyTorch 官方教程</strong>：autograd、nn.Module、optimizer</li>
+                    <li><strong>Karpathy 视频</strong>：「The spelled-out intro to neural networks and backpropagation」</li>
+                    <li><strong>扩展阅读</strong>：反向模式自动微分、计算图优化、张量运算</li>
+                    <li><strong>动手实践</strong>：在 micrograd 基础上添加更多运算（如 exp、log、softmax）</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <p><strong>一句话总结</strong>：micrograd 用最少的代码揭示了深度学习最本质的机制——通过计算图和链式法则自动求梯度，再用梯度下降优化参数。</p>
+                </div>
+
+                <div class="quiz-container" data-chapter="summary"></div>
+
+                <div class="footer">
+                    <p>基于 micrograd 学习整理 | 可离线打开复习</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/quiz.js"></script>
+    <script src="js/cases.js"></script>
+    <script src="js/demos/computational-graph.js"></script>
+    <script src="js/demos/scalar-autodiff.js"></script>
+    <script src="js/demos/activation-functions.js"></script>
+    <script src="js/demos/mlp-trainer.js"></script>
+</body>
+</html>
