@@ -29,6 +29,7 @@
             <div class="nav-section">目录</div>
             <ul class="nav-list">
                 <li class="nav-item"><a href="#intro" class="nav-link">导学</a></li>
+                <li class="nav-item"><a href="#primer" class="nav-link">前置知识：神经网络</a></li>
                 <li class="nav-item"><a href="#chapter1" class="nav-link">第 1 章：Value 与计算图</a></li>
                 <li class="nav-item"><a href="#chapter2" class="nav-link">第 2 章：前向传播</a></li>
                 <li class="nav-item"><a href="#chapter3" class="nav-link">第 3 章：反向传播</a></li>
@@ -112,7 +113,133 @@
                 </a>
             </div>
 
-            <!-- Chapter 1 -->
+            
+            <!-- Prerequisite: Neural Network Background -->
+            <section id="primer">
+                <h2>前置知识：神经网络是什么</h2>
+
+                <p class="section-intro">如果你完全没接触过神经网络，不用慌。micrograd 本身只有 150 行代码，但它背后想解决的问题是「如何让计算机像人一样从数据中学习规律」。这一节用最少的概念帮你铺好背景。</p>
+
+                <h3>0.1 从一个例子开始</h3>
+                <p>假设你要写一个程序判断一张图片是不是猫。传统编程的做法是：</p>
+                <ol>
+                    <li>程序员观察猫的特征（尖耳朵、胡须、圆眼睛）</li>
+                    <li>手动写很多 if-else 规则</li>
+                    <li>发现规则太多、太复杂，根本写不完</li>
+                </ol>
+
+                <p>神经网络的做法完全不同：</p>
+                <ol>
+                    <li>准备很多猫和非猫的图片，标注好答案</li>
+                    <li>让模型自己从图片中总结规律</li>
+                    <li>模型通过「试错」不断调整内部参数，越调越准</li>
+                </ol>
+
+                <div class="highlight-box">
+                    <p><strong>一句话</strong>：神经网络不是人写规则，而是用数据「调」出来的函数。</p>
+                </div>
+
+                <h3>0.2 神经元：最小的计算单元</h3>
+                <p>神经网络的最小单位叫<strong>神经元（neuron）</strong>，它做的计算非常简单：</p>
+
+                <pre><code>输出 = 激活函数( w₁·x₁ + w₂·x₂ + ... + wₙ·xₙ + b )</code></pre>
+
+                <p>其中：</p>
+                <ul>
+                    <li><code>x₁, x₂, ..., xₙ</code>：输入，比如图片的像素值、一句话的编码</li>
+                    <li><code>w₁, w₂, ..., wₙ</code>：<strong>权重（weight）</strong>，表示每个输入的重要性</li>
+                    <li><code>b</code>：<strong>偏置（bias）</strong>，决定神经元是否更容易被激活</li>
+                    <li><strong>激活函数</strong>：给神经元引入非线性，否则多层叠加也只是一条直线</li>
+                </ul>
+
+                <div class="concept-box">
+                    <p><strong>类比：</strong>神经元就像一个投票器。每个输入投一票，权重表示这票的分量，偏置是「通过门槛」，激活函数决定最终是「强烈支持」还是「弃权」。</p>
+                </div>
+
+                <h3>0.3 神经网络：把神经元堆起来</h3>
+                <p>单个神经元能力很弱，但把很多神经元分层连接起来，就能表达复杂函数。</p>
+
+                <ul>
+                    <li><strong>输入层</strong>：接收原始数据（如图片像素、数字特征）</li>
+                    <li><strong>隐藏层</strong>：位于中间的层，负责提取和组合特征</li>
+                    <li><strong>输出层</strong>：给出最终预测（如是猫的概率、分类结果）</li>
+                </ul>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🧠 神经网络结构一览</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">观察一个简单的三层神经网络：输入层、隐藏层、输出层，以及数据如何前向流动。</div>
+                    <div id="mg-network-overview-demo"></div>
+                </div>
+
+                <h3>0.4 训练到底在做什么？</h3>
+                <p>训练神经网络，本质上是一个「猜答案 → 看差多少 → 调整参数」的循环：</p>
+
+                <ol>
+                    <li><strong>前向传播</strong>：输入数据，一层层算到输出，得到预测</li>
+                    <li><strong>计算损失</strong>：比较预测和真实答案，得到「错得多离谱」</li>
+                    <li><strong>反向传播</strong>：计算每个参数对损失的贡献（梯度）</li>
+                    <li><strong>更新参数</strong>：沿负梯度方向微调权重和偏置，让损失变小</li>
+                </ol>
+
+                <div class="process-flow">
+                    <span class="process-step">输入数据</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">前向传播</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">计算损失</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">反向传播</span>
+                    <span class="process-arrow">→</span>
+                    <span class="process-step">更新参数</span>
+                </div>
+
+                <h3>0.5 几个必须知道的概念</h3>
+
+                <div class="comparison comparison-3">
+                    <div class="comparison-box">
+                        <h4>权重 Weight</h4>
+                        <p>神经元对各个输入的重视程度。可正可负，可大可小。训练就是调整这些数字。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>偏置 Bias</h4>
+                        <p>神经元的「触发阈值」。没有偏置，很多函数即使调整权重也无法拟合。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>损失 Loss</h4>
+                        <p>预测与真实答案之间的差距。训练目标就是让损失越来越小。</p>
+                    </div>
+                </div>
+
+                <div class="comparison comparison-3">
+                    <div class="comparison-box">
+                        <h4>梯度 Gradient</h4>
+                        <p>损失对每个参数的敏感度。告诉我们参数该往哪个方向调、调多少。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>激活函数 Activation</h4>
+                        <p>给网络引入非线性。没有它，无论多少层都只能拟合直线。</p>
+                    </div>
+                    <div class="comparison-box">
+                        <h4>学习率 Learning Rate</h4>
+                        <p>每次参数调整的步长。太大容易震荡，太小收敛太慢。</p>
+                    </div>
+                </div>
+
+                <div class="concept-check">
+                    <h4>概念检查</h4>
+                    <ol>
+                        <li>神经网络用数据自动学习规律，而不是人工写规则</li>
+                        <li>神经元 = 加权求和 + 偏置 + 激活函数</li>
+                        <li>训练 = 前向传播 → 算损失 → 反向传播 → 更新参数</li>
+                        <li>梯度告诉我们每个参数该怎么调</li>
+                    </ol>
+                </div>
+            </section>
+
+<!-- Chapter 1 -->
             <section id="chapter1">
                 <h2>第 1 章：Value 对象与计算图</h2>
 
@@ -623,6 +750,7 @@ MLP(nin, nouts)  → 多层 Layer，最后一层通常不用激活函数</code><
     <script src="js/main.js"></script>
     <script src="js/quiz.js"></script>
     <script src="js/cases.js"></script>
+    <script src="js/demos/network-overview.js"></script>
     <script src="js/demos/computational-graph.js"></script>
     <script src="js/demos/scalar-autodiff.js"></script>
     <script src="js/demos/activation-functions.js"></script>
