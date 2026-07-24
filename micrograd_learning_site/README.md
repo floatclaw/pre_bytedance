@@ -42,6 +42,34 @@ python3 -m http.server 8080
 
 双击 `index.html`，无需联网即可学习。
 
+### 方式 3：运行原版 micrograd 源码
+
+网站目录内已包含原版 micrograd 源码，可以直接跑：
+
+```bash
+cd micrograd_learning_site/micrograd
+python3 run_demo.py
+```
+
+示例输出：
+
+```
+step   0 | loss = 2.7653
+step  10 | loss = 0.4492
+step  20 | loss = 0.3612
+step  30 | loss = 0.3417
+step  40 | loss = 0.3314
+
+accuracy = 71/80 = 88.75%
+micrograd demo ran successfully
+```
+
+也可以直接查看官方示例：
+
+```bash
+jupyter notebook demo.ipynb
+```
+
 ---
 
 ## 文件结构
@@ -55,16 +83,21 @@ micrograd_learning_site/
 │   ├── components.css
 │   ├── demos.css
 │   └── animations.css
-├── js/
-│   ├── main.js                 # 主题、导航、进度
-│   ├── utils.js                # micrograd 引擎：Value、Neuron、Layer、MLP
-│   ├── quiz.js                 # 章节测验引擎
-│   ├── cases.js                # 真实案例与面试题渲染
-│   └── demos/                  # 交互 Demo
+├── js/                         # 网站交互引擎
+│   ├── main.js
+│   ├── utils.js
+│   ├── quiz.js
+│   ├── cases.js
+│   └── demos/
 │       ├── computational-graph.js
 │       ├── scalar-autodiff.js
 │       ├── activation-functions.js
 │       └── mlp-trainer.js
+├── micrograd/                  # 原版 micrograd 源码（已下载）
+│   ├── micrograd/engine.py     # 标量 autograd 引擎
+│   ├── micrograd/nn.py         # 神经网络库
+│   ├── demo.ipynb              # 官方训练示例
+│   └── run_demo.py             # 可直接运行的 Moon 二分类示例
 └── images/                     # 图片资源
 ```
 
