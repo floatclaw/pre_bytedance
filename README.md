@@ -22,20 +22,21 @@
 
 ```
 bytedance/
-├── bytecover3_site/          # 翻唱识别交互式课程网站
-├── bytecover3_demo/          # 简化版 Python Demo
-├── milvus_learning_site/     # Milvus 向量数据库交互式课程网站
-├── shazam_learning_site/     # Shazam 音频指纹交互式课程网站
-├── micrograd_learning_site/  # micrograd 自动微分与神经网络交互式课程网站
-├── 神经网络/                  # 神经网络原理解读文章
+├── bytecover3/                # ByteCover3 翻唱识别论文学习
+│   ├── bytecover3_site/       # 翻唱识别交互式课程网站
+│   ├── bytecover3_demo/       # 简化版 Python Demo
+│   └── BYTECOVER3- ACCURATE COVER SONG IDENTIFICATION ON SHORT QUERIES.pdf
+│                              # 原始论文
+├── milvus_learning_site/      # Milvus 向量数据库交互式课程网站
+├── shazam_learning_site/      # Shazam 音频指纹交互式课程网站
+├── micrograd_learning_site/   # micrograd 自动微分与神经网络交互式课程网站
+├── 神经网络/                   # 神经网络原理解读文章
 │   ├── 激活函数/
 │   └── CNN/
-├── K3/                       # Kimi K3 技术报告
-└── BYTECOVER3- ACCURATE COVER SONG IDENTIFICATION ON SHORT QUERIES.pdf
-                              # 原始论文
+└── K3/                        # Kimi K3 技术报告
 ```
 
-### 1. `bytecover3_site/` — 翻唱识别交互式课程网站
+### 1. `bytecover3/bytecover3_site/` — 翻唱识别交互式课程网站
 
 一个完全静态、可离线使用的学习网站，无需后端和外部 CDN。
 
@@ -62,19 +63,19 @@ bytedance/
 **如何打开：**
 
 ```bash
-cd bytecover3_site
+cd bytecover3/bytecover3_site
 python3 -m http.server 8080
 ```
 
 然后访问 http://localhost:8080
 
-也可以直接双击 `index.html` 离线打开。
+也可以直接双击 `bytecover3/bytecover3_site/index.html` 离线打开。
 
-详见 [`bytecover3_site/README.md`](bytecover3_site/README.md)。
+详见 [`bytecover3/bytecover3_site/README.md`](bytecover3/bytecover3_site/README.md)。
 
 ---
 
-### 2. `bytecover3_demo/` — 简化版 Python Demo
+### 2. `bytecover3/bytecover3_demo/` — 简化版 Python Demo
 
 一个可以跑起来的简化版 ByteCover3，用合成音频演示核心流程。
 
@@ -87,7 +88,7 @@ python3 -m http.server 8080
 **运行：**
 
 ```bash
-cd bytecover3_demo
+cd bytecover3/bytecover3_demo
 pip install numpy soundfile torch librosa matplotlib scikit-learn
 python demo.py
 ```
@@ -243,7 +244,7 @@ Moonshot AI 发布的 Kimi K3 大模型官方技术报告。
 ## 学习建议
 
 1. **先看网站**：按章节顺序阅读，配合交互 Demo 理解概念。
-2. **再跑 Demo**：用 `bytecover3_demo` 动手实验，看代码如何对应论文流程。
+2. **再跑 Demo**：用 `bytecover3/bytecover3_demo` 动手实验，看代码如何对应论文流程。
 3. **参考论文**：遇到细节问题时对照原始论文。
 
 ---
@@ -261,7 +262,7 @@ Moonshot AI 发布的 Kimi K3 大模型官方技术报告。
 
 本项目没有任何外部 CDN 依赖，所有 CSS、JS、图片都是本地文件。把整个目录复制到任何地方：
 
-- 双击 `bytecover3_site/index.html`、`milvus_learning_site/index.html`、`shazam_learning_site/index.html` 或 `micrograd_learning_site/index.html` 即可离线学习课程网站；
+- 双击 `bytecover3/bytecover3_site/index.html`、`milvus_learning_site/index.html`、`shazam_learning_site/index.html` 或 `micrograd_learning_site/index.html` 即可离线学习课程网站；
 - 直接打开 `神经网络/` 下的 `.md` 文件即可离线阅读文章；
 - `K3/k3_tech_report.pdf` 可直接用 PDF 阅读器打开。
 
@@ -277,4 +278,4 @@ Moonshot AI 发布的 Kimi K3 大模型官方技术报告。
 
 ## 参考资料
 
-- 原始论文：`BYTECOVER3- ACCURATE COVER SONG IDENTIFICATION ON SHORT QUERIES.pdf`
+- 原始论文：`bytecover3/BYTECOVER3- ACCURATE COVER SONG IDENTIFICATION ON SHORT QUERIES.pdf`
