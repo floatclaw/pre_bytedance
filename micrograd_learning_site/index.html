@@ -156,6 +156,185 @@
                     <p><strong>类比：</strong>神经元就像一个投票器。每个输入投一票，权重表示这票的分量，偏置是「通过门槛」，激活函数决定最终是「强烈支持」还是「弃权」。</p>
                 </div>
 
+                <h4>具体例子：一个神经元在算什么？</h4>
+                <div class="card">
+                    <p>假设一个神经元有两个输入：</p>
+                    <ul>
+                        <li>输入 <code>x₁ = 0.5</code>，对应权重 <code>w₁ = 0.2</code></li>
+                        <li>输入 <code>x₂ = -1.0</code>，对应权重 <code>w₂ = 0.4</code></li>
+                        <li>偏置 <code>b = -0.1</code>，激活函数用 <code>tanh</code></li>
+                    </ul>
+                    <p>计算过程如下：</p>
+                    <ol>
+                        <li><strong>加权求和</strong>：<code>z = w₁·x₁ + w₂·x₂ + b</code><br>
+                            <code>z = 0.2 × 0.5 + 0.4 × (-1.0) + (-0.1) = 0.10 - 0.40 - 0.10 = -0.40</code></li>
+                        <li><strong>激活函数</strong>：<code>output = tanh(-0.40)</code><br>
+                            <code>output ≈ -0.3799</code></li>
+                    </ol>
+                    <p>所以这个神经元的最终输出约是 <strong>-0.38</strong>。训练时，我们会根据这个输出和真实答案的差距，去调整 <code>w₁、w₂、b</code> 三个参数。</p>
+                </div>
+
+                <h4>0.2.1 神经元能表示什么？以逻辑门为例</h4>
+                <p>单个神经元已经能表示一些简单规律。假设输入只能是 0 或 1，激活函数用「大于 0 输出 1，否则输出 0」的简化模型：</p>
+
+                <div class="card">
+                    <p><strong>AND 门</strong>：两个输入都为 1 时才输出 1。</p>
+                    <ul>
+                        <li>权重：w₁ = 1, w₂ = 1</li>
+                        <li>偏置：b = -1.5</li>
+                    </ul>
+                    <table>
+                        <tr>
+                            <th>x₁</th>
+                            <th>x₂</th>
+                            <th>z = x₁ + x₂ - 1.5</th>
+                            <th>输出</th>
+                        </tr>
+                        <tr>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>-1.5</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>-0.5</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>0</td>
+                            <td>-0.5</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>0.5</td>
+                            <td>1</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <p><strong>OR 门</strong>：只要有一个输入为 1 就输出 1。</p>
+                    <ul>
+                        <li>权重：w₁ = 1, w₂ = 1</li>
+                        <li>偏置：b = -0.5</li>
+                    </ul>
+                    <p>你可以自己验证：只有 (0,0) 时输出 0，其余三种情况都输出 1。</p>
+                </div>
+
+                <div class="card">
+                    <p><strong>XOR 门</strong>：两个输入不同时输出 1。</p>
+                    <p>这是单个神经元做不到的。无论你选什么权重和偏置，单个神经元只能画一条直线把平面分成两半，而 XOR 的四个点（00、01、10、11）无法用一条直线把「相同」和「不同」分开。</p>
+                    <p><strong>结论</strong>：单个神经元只能解决线性可分问题，复杂问题需要把多个神经元组合成网络。</p>
+                </div>
+
+                <h4>0.2.2 它是怎么学会 AND 的？</h4>
+                <p>前面我们直接给出了能表示 AND 的权重，但真实训练时这些权重是从随机值开始，通过<strong>不断试错</strong>慢慢调出来的。下面看一个完整过程。</p>
+
+                <div class="card">
+                    <p><strong>初始状态</strong></p>
+                    <pre><code>w₁ = -0.8,  w₂ = -0.8,  b = -1.0
+学习率 lr = 0.3</code></pre>
+
+                    <p>初始时，4 个样本的预测都是 0（因为 b 很负，很容易让 z ≤ 0）：</p>
+                    <table>
+                        <tr>
+                            <th>x₁</th>
+                            <th>x₂</th>
+                            <th>z = w₁x₁ + w₂x₂ + b</th>
+                            <th>预测</th>
+                            <th>目标</th>
+                        </tr>
+                        <tr>
+                            <td>0</td>
+                            <td>0</td>
+                            <td>-1.0</td>
+                            <td>0</td>
+                            <td>0 ✅</td>
+                        </tr>
+                        <tr>
+                            <td>0</td>
+                            <td>1</td>
+                            <td>-1.8</td>
+                            <td>0</td>
+                            <td>0 ✅</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>0</td>
+                            <td>-1.8</td>
+                            <td>0</td>
+                            <td>0 ✅</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>1</td>
+                            <td>-2.6</td>
+                            <td>0</td>
+                            <td>1 ❌</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>学习规则</strong>（感知机规则）：</p>
+                    <ul>
+                        <li>预测错了，且目标为 1：说明阈值太高，给 w 和 b 都加上 <code>lr × 输入</code></li>
+                        <li>预测错了，且目标为 0：说明阈值太低，给 w 和 b 都减去 <code>lr × 输入</code></li>
+                        <li>预测正确：不调整</li>
+                    </ul>
+
+                    <p><strong>第 1 轮迭代</strong></p>
+                    <p>只有 (1,1) 错了，目标为 1。更新：</p>
+                    <pre><code>w₁ = -0.8 + 0.3×1 = -0.5
+w₂ = -0.8 + 0.3×1 = -0.5
+b  = -1.0 + 0.3×1 = -0.7</code></pre>
+
+                    <p><strong>第 2 轮迭代</strong></p>
+                    <p>还是只有 (1,1) 错了，继续加 0.3：</p>
+                    <pre><code>w₁ = -0.5 + 0.3 = -0.2
+w₂ = -0.5 + 0.3 = -0.2
+b  = -0.7 + 0.3 = -0.4</code></pre>
+
+                    <p><strong>第 3 轮迭代</strong></p>
+                    <p>再加一次：</p>
+                    <pre><code>w₁ = -0.2 + 0.3 = 0.1
+w₂ = -0.2 + 0.3 = 0.1
+b  = -0.4 + 0.3 = -0.1</code></pre>
+
+                    <p>现在验证 4 个样本：</p>
+                    <table>
+                        <tr>
+                            <th>x₁</th>
+                            <th>x₂</th>
+                            <th>z = 0.1x₁ + 0.1x₂ - 0.1</th>
+                            <th>预测</th>
+                            <th>目标</th>
+                        </tr>
+                        <tr><td>0</td><td>0</td><td>-0.1</td><td>0</td><td>0 ✅</td></tr>
+                        <tr><td>0</td><td>1</td><td>0.0</td><td>0</td><td>0 ✅</td></tr>
+                        <tr><td>1</td><td>0</td><td>0.0</td><td>0</td><td>0 ✅</td></tr>
+                        <tr><td>1</td><td>1</td><td>0.1</td><td>1</td><td>1 ✅</td></tr>
+                    </table>
+
+                    <p><strong>训练完成</strong>：神经元从「全猜 0」开始，经过 3 轮调整，最终找到了一个能完美实现 AND 门的参数组合。</p>
+                </div>
+
+                <div class="concept-box">
+                    <p><strong>关键观察</strong>：训练过程中，模型只在犯错的样本上调整参数。因为 (1,1) 这个目标为 1 的样本反复错，所以 w₁、w₂、b 被不断往上推，直到它跨过 0 阈值。这和人类学习很像——错题做多了，参数就往对的方向修正。</p>
+                </div>
+
+                <div class="demo-container">
+                    <div class="demo-header">
+                        <div class="demo-title">🎓 单个神经元训练器</div>
+                        <span class="demo-badge">交互</span>
+                    </div>
+                    <div class="demo-description">观察一个神经元如何通过感知机学习规则，从随机权重开始学会 AND 门。</div>
+                    <div id="mg-single-neuron-trainer-demo"></div>
+                </div>
+
                 <h3>0.3 神经网络：把神经元堆起来</h3>
                 <p>单个神经元能力很弱，但把很多神经元分层连接起来，就能表达复杂函数。</p>
 
@@ -172,6 +351,56 @@
                     </div>
                     <div class="demo-description">观察一个简单的三层神经网络：输入层、隐藏层、输出层，以及数据如何前向流动。</div>
                     <div id="mg-network-overview-demo"></div>
+                </div>
+
+                <h4>0.3.1 一个完整的前向计算例子</h4>
+                <p>下面是一个 2→2→1 的网络，输入 2 个数，隐藏层 2 个神经元，输出 1 个数。我们用具体的权重和偏置，看数据怎么从输入流到最后输出。</p>
+
+                <div class="card">
+                    <p><strong>网络参数</strong></p>
+                    <table>
+                        <tr>
+                            <th>位置</th>
+                            <th>权重</th>
+                            <th>偏置</th>
+                            <th>激活函数</th>
+                        </tr>
+                        <tr>
+                            <td>隐藏神经元 1</td>
+                            <td>w₁₁=0.2, w₁₂=0.4</td>
+                            <td>b₁=0.1</td>
+                            <td>tanh</td>
+                        </tr>
+                        <tr>
+                            <td>隐藏神经元 2</td>
+                            <td>w₂₁=-0.3, w₂₂=0.1</td>
+                            <td>b₂=-0.2</td>
+                            <td>tanh</td>
+                        </tr>
+                        <tr>
+                            <td>输出神经元</td>
+                            <td>v₁=0.5, v₂=-0.5</td>
+                            <td>b_out=0.0</td>
+                            <td>无</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>输入</strong>：x₁ = 0.5, x₂ = 1.0</p>
+
+                    <p><strong>第 1 层：隐藏层</strong></p>
+                    <pre><code>z₁ = 0.2×0.5 + 0.4×1.0 + 0.1 = 0.10 + 0.40 + 0.10 = 0.60
+h₁ = tanh(0.60) ≈ 0.5370
+
+z₂ = -0.3×0.5 + 0.1×1.0 + (-0.2) = -0.15 + 0.10 - 0.20 = -0.25
+h₂ = tanh(-0.25) ≈ -0.2449</code></pre>
+
+                    <p><strong>第 2 层：输出层</strong></p>
+                    <pre><code>out = 0.5×h₁ + (-0.5)×h₂ + 0.0
+    = 0.5×0.5370 + (-0.5)×(-0.2449)
+    = 0.2685 + 0.1225
+    ≈ 0.3910</code></pre>
+
+                    <p><strong>结果</strong>：输入 [0.5, 1.0] 经过这个网络后，输出约 <strong>0.39</strong>。如果这是房价预测，0.39 就是模型对这套房的预测值；如果是二分类，可以把它和 0 比较，大于 0 归为正类。</p>
                 </div>
 
                 <h3>0.4 训练到底在做什么？</h3>
@@ -196,7 +425,51 @@
                     <span class="process-step">更新参数</span>
                 </div>
 
-                <h3>0.5 几个必须知道的概念</h3>
+                <h4>0.4.1 训练过程的数值例子</h4>
+                <p>假设只有一个参数 <code>w</code>，当前值是 <code>0.5</code>。输入 <code>x = 2.0</code> 时，网络输出 <code>0.5 × 2.0 = 1.0</code>，但真实答案应该是 <code>2.0</code>。</p>
+
+                <div class="card">
+                    <p><strong>第 1 步：计算损失</strong></p>
+                    <pre><code>loss = (真实值 - 预测值)² = (2.0 - 1.0)² = 1.0</code></pre>
+
+                    <p><strong>第 2 步：求梯度</strong></p>
+                    <p>梯度告诉我们：如果 w 增加一点，loss 会怎么变。</p>
+                    <pre><code>∂loss/∂w = 2 × (预测值 - 真实值) × x
+        = 2 × (1.0 - 2.0) × 2.0
+        = -4.0</code></pre>
+                    <p>梯度为 <strong>负数</strong>，说明 <code>w</code> 增大时 loss 会下降。</p>
+
+                    <p><strong>第 3 步：更新参数</strong></p>
+                    <p>学习率 <code>lr = 0.1</code>，更新规则是：</p>
+                    <pre><code>w = w - lr × ∂loss/∂w
+  = 0.5 - 0.1 × (-4.0)
+  = 0.5 + 0.4
+  = 0.9</code></pre>
+
+                    <p><strong>第 4 步：验证</strong></p>
+                    <p>更新后，同样输入 <code>x = 2.0</code>：</p>
+                    <pre><code>新输出 = 0.9 × 2.0 = 1.8
+新损失 = (2.0 - 1.8)² = 0.04</code></pre>
+                    <p>损失从 <strong>1.0</strong> 降到 <strong>0.04</strong>，预测从 <strong>1.0</strong> 升到 <strong>1.8</strong>，更接近真实值 2.0。这就是训练一次的效果。</p>
+                </div>
+
+                <h3>0.5 为什么需要非线性？</h3>
+                <p>如果神经网络里只有乘法和加法，无论堆多少层，它都等价于一个线性函数：</p>
+                <pre><code>y = W₂ × (W₁ × x + b₁) + b₂ = W × x + b</code></pre>
+                <p>这样的网络只能画直线，无法处理弯曲的边界。就像前面说的 XOR 问题，单层神经元连一条斜线都画不出来，更别说多层线性堆叠。</p>
+
+                <div class="card">
+                    <p><strong>直观例子</strong>：假设你要根据「学习时长」和「睡眠时长」预测「考试通过与否」。</p>
+                    <ul>
+                        <li>线性模型只能画一条直线：学习时间长就一定通过。</li>
+                        <li>但真实世界可能是：学习太短不通过，学习太长但睡眠不足也不通过。</li>
+                        <li>非线性模型（带激活函数）可以画出弯曲的决策边界，捕捉这种复杂关系。</li>
+                    </ul>
+                </div>
+
+                <p><strong>激活函数</strong>（如 Tanh、Sigmoid、ReLU）的作用就是在神经元输出后引入非线性。没有它，再深的网络也只是一条直线。</p>
+
+                <h3>0.6 几个必须知道的概念</h3>
 
                 <div class="comparison comparison-3">
                     <div class="comparison-box">
@@ -233,9 +506,16 @@
                     <ol>
                         <li>神经网络用数据自动学习规律，而不是人工写规则</li>
                         <li>神经元 = 加权求和 + 偏置 + 激活函数</li>
+                        <li>单个神经元能解决 AND、OR 等线性可分问题，但解决不了 XOR</li>
+                        <li>多层网络前向传播就是逐层计算：输入 → 隐藏层 → 输出</li>
                         <li>训练 = 前向传播 → 算损失 → 反向传播 → 更新参数</li>
                         <li>梯度告诉我们每个参数该怎么调</li>
+                        <li>没有激活函数，多层网络等价于单层线性变换，只能画直线</li>
                     </ol>
+                </div>
+
+                <div class="highlight-box">
+                    <p><strong>下一步</strong>：上面的例子中，前向传播、损失、梯度我们都是手算的。当网络变大、参数变多时，手动求梯度会变得非常困难。接下来你会学习 micrograd：一个用标量自动微分自动完成这些计算的引擎。</p>
                 </div>
             </section>
 
@@ -338,6 +618,50 @@
                     </tr>
                 </table>
 
+                <h4>具体例子：Value 对象里到底存了什么？</h4>
+                <div class="card">
+                    <p>看下面这行代码：</p>
+                    <pre><code>const a = new Value(2.0, [], '', 'a');
+const b = new Value(3.0, [], '', 'b');
+const c = a.mul(b);  // c = a * b</code></pre>
+                    <p>执行后，三个 Value 对象内部状态如下：</p>
+                    <table>
+                        <tr>
+                            <th>对象</th>
+                            <th>data</th>
+                            <th>grad</th>
+                            <th>_op</th>
+                            <th>_prev</th>
+                            <th>label</th>
+                        </tr>
+                        <tr>
+                            <td><code>a</code></td>
+                            <td>2.0</td>
+                            <td>0.0</td>
+                            <td>''</td>
+                            <td>空集合</td>
+                            <td>'a'</td>
+                        </tr>
+                        <tr>
+                            <td><code>b</code></td>
+                            <td>3.0</td>
+                            <td>0.0</td>
+                            <td>''</td>
+                            <td>空集合</td>
+                            <td>'b'</td>
+                        </tr>
+                        <tr>
+                            <td><code>c</code></td>
+                            <td>6.0</td>
+                            <td>0.0</td>
+                            <td>'*'</td>
+                            <td>{a, b}</td>
+                            <td>''</td>
+                        </tr>
+                    </table>
+                    <p><code>c.data = 6.0</code> 是前向计算结果；<code>_op = '*'</code> 和 <code>_prev = {a, b}</code> 一起说明「c 是由 a 和 b 做乘法得到的」。这些信息就是反向传播时用的「地图」。</p>
+                </div>
+
                 <h3>1.3 计算图长什么样？</h3>
                 <p>当你写下 <code>c = a + b</code> 时，micrograd 会创建三个 Value 节点：a、b、c，并在 a、b 和 c 之间连上两条边，标记运算符为 <code>+</code>。</p>
                 <p>更复杂的表达式会形成更大的<strong>有向无环图（DAG）</strong>。这个图就是自动微分的基础：前向传播计算数值，反向传播沿着图的边回传梯度。</p>
@@ -409,6 +733,43 @@ const d = c.add(a);  // d.data = 8.0</code></pre>
                     </tr>
                 </table>
 
+                <h3>2.3 具体例子：一步步前向传播</h3>
+                <div class="card">
+                    <p>看表达式 <code>f = (a + b) * c</code>，其中 <code>a = 2.0</code>，<code>b = 3.0</code>，<code>c = 4.0</code>。前向传播会逐次创建新节点：</p>
+                    <pre><code>const a = new Value(2.0, [], '', 'a');
+const b = new Value(3.0, [], '', 'b');
+const c = new Value(4.0, [], '', 'c');
+const d = a.add(b);   // d = a + b
+const f = d.mul(c);   // f = d * c</code></pre>
+                    <table>
+                        <tr>
+                            <th>步骤</th>
+                            <th>代码</th>
+                            <th>计算</th>
+                            <th>结果</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td><code>a = 2.0, b = 3.0, c = 4.0</code></td>
+                            <td>创建叶子节点</td>
+                            <td>a=2, b=3, c=4</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td><code>d = a + b</code></td>
+                            <td>d.data = 2 + 3</td>
+                            <td>d=5, _op='+'</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td><code>f = d * c</code></td>
+                            <td>f.data = 5 × 4</td>
+                            <td>f=20, _op='*'</td>
+                        </tr>
+                    </table>
+                    <p>最终 <code>f.data = 20.0</code>。同时，计算图已经建好：<code>d</code> 依赖 <code>{a, b}</code>，<code>f</code> 依赖 <code>{d, c}</code>。反向传播时，就会沿着这些边从 f 往回走。</p>
+                </div>
+
                 <div class="demo-container">
                     <div class="demo-header">
                         <div class="demo-title">🔢 标量自动微分 playground</div>
@@ -471,6 +832,70 @@ const d = c.add(a);  // d.data = 8.0</code></pre>
 
                 <p>在计算图中，<code>dy/dg</code> 是上游梯度，<code>dg/dx</code> 是局部导数，两者相乘就得到传给 x 的梯度。</p>
 
+                <h3>3.3 具体例子：一步步反向传播</h3>
+                <div class="card">
+                    <p>继续用上面的例子 <code>f = (a + b) * c</code>，其中 a=2, b=3, c=4，前向结果 f=20。现在调用 <code>f.backward()</code>，看看每个节点的 grad 怎么算出来。</p>
+                    <p><strong>第 0 步：拓扑排序</strong></p>
+                    <p>递归遍历得到 topo 数组（叶子先加入，根最后加入）：</p>
+                    <pre><code>topo = [a, b, c, d, f]</code></pre>
+                    <p>反向遍历顺序就是 <code>f → d → c → b → a</code>。</p>
+
+                    <p><strong>第 1 步：根节点 f 的梯度置 1</strong></p>
+                    <pre><code>f.grad = 1.0</code></pre>
+                    <p>因为 f 对 f 的导数就是 1。</p>
+
+                    <p><strong>第 2 步：f = d * c 的反向传播</strong></p>
+                    <p>乘法规则：d.grad += c.data * f.grad，c.grad += d.data * f.grad</p>
+                    <pre><code>d.grad += 4.0 * 1.0 = 4.0
+c.grad += 5.0 * 1.0 = 5.0</code></pre>
+
+                    <p><strong>第 3 步：d = a + b 的反向传播</strong></p>
+                    <p>加法规则：a.grad += d.grad，b.grad += d.grad</p>
+                    <pre><code>a.grad += 4.0
+b.grad += 4.0</code></pre>
+
+                    <p><strong>最终结果</strong></p>
+                    <table>
+                        <tr>
+                            <th>节点</th>
+                            <th>data</th>
+                            <th>grad（∂f/∂该节点）</th>
+                            <th>含义</th>
+                        </tr>
+                        <tr>
+                            <td>a</td>
+                            <td>2.0</td>
+                            <td>4.0</td>
+                            <td>a 增加 0.01，f 约增加 0.04</td>
+                        </tr>
+                        <tr>
+                            <td>b</td>
+                            <td>3.0</td>
+                            <td>4.0</td>
+                            <td>b 增加 0.01，f 约增加 0.04</td>
+                        </tr>
+                        <tr>
+                            <td>c</td>
+                            <td>4.0</td>
+                            <td>5.0</td>
+                            <td>c 增加 0.01，f 约增加 0.05</td>
+                        </tr>
+                        <tr>
+                            <td>d</td>
+                            <td>5.0</td>
+                            <td>4.0</td>
+                            <td>d 增加 0.01，f 约增加 0.04</td>
+                        </tr>
+                        <tr>
+                            <td>f</td>
+                            <td>20.0</td>
+                            <td>1.0</td>
+                            <td>损失对自己的导数</td>
+                        </tr>
+                    </table>
+                    <p>你可以手算验证：把 a 从 2 改成 2.01，f 从 20 变成 20.04，确实增加了 0.04。</p>
+                </div>
+
                 <div class="concept-check">
                     <h4>概念检查</h4>
                     <ol>
@@ -500,6 +925,31 @@ d.backward();
 // a.grad = dc/da 经过 b 的贡献 + 经过 c 的贡献</code></pre>
 
                 <p>这就是为什么 micrograd 的 _backward 使用 <code>+=</code> 而不是 <code>=</code>。PyTorch 中也一样，所以每次 backward 前要 <code>zero_grad()</code>。</p>
+
+                <h3>4.3 具体例子：多路径梯度累加</h3>
+                <div class="card">
+                    <p>上面代码中，a=2，b=a+1=3，c=a+2=4，d=b*c=12。现在看 a 的梯度为什么是两路相加。</p>
+
+                    <p><strong>路径 1：d → b → a</strong></p>
+                    <ul>
+                        <li>∂d/∂b = c = 4</li>
+                        <li>∂b/∂a = 1（因为 b = a + 1）</li>
+                        <li>所以 ∂d/∂a 经这条路径 = 4 × 1 = 4</li>
+                    </ul>
+
+                    <p><strong>路径 2：d → c → a</strong></p>
+                    <ul>
+                        <li>∂d/∂c = b = 3</li>
+                        <li>∂c/∂a = 1（因为 c = a + 2）</li>
+                        <li>所以 ∂d/∂a 经这条路径 = 3 × 1 = 3</li>
+                    </ul>
+
+                    <p><strong>总梯度</strong>：<code>∂d/∂a = 4 + 3 = 7</code>。</p>
+
+                    <p>你用手算验证：把 a 从 2 改成 2.01，则 b=3.01, c=4.01, d=3.01×4.01≈12.0701，增加了约 0.0701，和梯度 7 × 0.01 = 0.07 一致。</p>
+
+                    <p>这就是 <code>+=</code> 的原因：同一个节点可能通过多条路径影响输出，每条路径的贡献都要累加进来。</p>
+                </div>
 
                 <h3>4.2 拓扑排序的作用</h3>
                 <p>计算图是一个有向无环图（DAG）。反向传播必须按照「先子节点、后父节点」的顺序进行，否则梯度还没算完就被使用了。</p>
@@ -556,6 +1006,45 @@ d.backward();
                         <p><code>ReLU(x) = max(0, x)</code></p>
                         <p>计算简单，正区间梯度恒为 1。负区间梯度为 0，可能导致死神经元。</p>
                     </div>
+                </div>
+
+                <h3>5.3 具体例子：激活函数算出来是多少？</h3>
+                <div class="card">
+                    <p>以输入 <code>x = 1.0</code> 为例，计算三个激活函数的输出和导数：</p>
+                    <table>
+                        <tr>
+                            <th>激活函数</th>
+                            <th>输出 f(x)</th>
+                            <th>导数 f'(x)</th>
+                            <th>数值结果</th>
+                        </tr>
+                        <tr>
+                            <td>Tanh</td>
+                            <td><code>(e^x - e^{-x}) / (e^x + e^{-x})</code></td>
+                            <td><code>1 - tanh(x)^2</code></td>
+                            <td>f(1.0) ≈ 0.7616，f'(1.0) ≈ 0.4200</td>
+                        </tr>
+                        <tr>
+                            <td>Sigmoid</td>
+                            <td><code>1 / (1 + e^{-x})</code></td>
+                            <td><code>σ(x)(1 - σ(x))</code></td>
+                            <td>f(1.0) ≈ 0.7311，f'(1.0) ≈ 0.1966</td>
+                        </tr>
+                        <tr>
+                            <td>ReLU</td>
+                            <td><code>max(0, x)</code></td>
+                            <td><code>1 if x&gt;0 else 0</code></td>
+                            <td>f(1.0) = 1.0，f'(1.0) = 1.0</td>
+                        </tr>
+                    </table>
+                    <p>如果输入是负数，比如 <code>x = -2.0</code>：</p>
+                    <ul>
+                        <li>Tanh(-2.0) ≈ -0.9640，导数 ≈ 0.0707（接近饱和，梯度很小）</li>
+                        <li>Sigmoid(-2.0) ≈ 0.1192，导数 ≈ 0.1050（也接近饱和）</li>
+                        <li>ReLU(-2.0) = 0，导数 = 0（完全「死掉」，梯度无法回传）</li>
+                    </ul>
+                    <p>这就是为什么深层网络训练时，Tanh/Sigmoid 容易出现梯度消失，而 ReLU 容易出现死神经元。
+                    </p>
                 </div>
 
                 <div class="demo-container">
@@ -624,7 +1113,159 @@ MLP(nin, nouts)  → 多层 Layer，最后一层通常不用激活函数</code><
     });
 }</code></pre>
 
-                <h3>6.3 Moon 数据集二分类</h3>
+                <h3>6.3 具体例子：一个神经元的一次训练迭代</h3>
+                <div class="card">
+                    <p>假设我们有一个单输入神经元，要让它学会「输入 2.0 时输出接近 1.0」。真实标签
+                        <code>y = 1.0</code>，学习率 <code>lr = 0.1</code>。</p>
+                    <p>初始参数：权重 <code>w = 0.5</code>，偏置 <code>b = 0.0</code>，激活函数用 tanh。</p>
+
+                    <p><strong>第 1 步：前向传播</strong></p>
+                    <pre><code>z = w * x + b = 0.5 * 2.0 + 0.0 = 1.0
+output = tanh(1.0) ≈ 0.7616</code></pre>
+
+                    <p><strong>第 2 步：计算损失</strong></p>
+                    <p>用平方误差损失：
+                        <code>loss = (y - output)^2 = (1.0 - 0.7616)^2 ≈ 0.0568</code>
+                    </p>
+
+                    <p><strong>第 3 步：反向传播</strong></p>
+                    <p>链式法则计算损失对 w 和 b 的梯度：</p>
+                    <pre><code>∂loss/∂output = 2 * (output - y) = 2 * (0.7616 - 1.0) = -0.4768
+∂output/∂z = 1 - tanh(z)^2 = 1 - 0.7616^2 ≈ 0.4200
+∂z/∂w = x = 2.0
+∂z/∂b = 1
+
+∂loss/∂w = -0.4768 * 0.4200 * 2.0 ≈ -0.4005
+∂loss/∂b = -0.4768 * 0.4200 * 1 ≈ -0.2003</code></pre>
+
+                    <p><strong>第 4 步：参数更新</strong></p>
+                    <pre><code>w = w - lr * ∂loss/∂w = 0.5 - 0.1 * (-0.4005) ≈ 0.5401
+b = b - lr * ∂loss/∂b = 0.0 - 0.1 * (-0.2003) ≈ 0.0200</code></pre>
+
+                    <p><strong>结果</strong>：更新后 w 变大、b 变大，神经元输出会向 1.0 靠近。重复这个循环几十次，
+                        输出就能接近目标值 1.0。</p>
+                </div>
+
+                <h3>6.4 具体例子：一个完整 MLP 的定义、训练与预测</h3>
+                <div class="card">
+                    <p>下面用一个<strong>极小的二层 MLP</strong>，把「定义网络 → 前向传播 → 计算损失 → 反向传播 → 更新参数 → 预测新样本」完整走一遍。为了让你能用手算验证，所有权重和偏置都是人工指定的。</p>
+
+                    <p><strong>第 1 步：定义网络结构</strong></p>
+                    <ul>
+                        <li>输入层：2 个特征（x₁, x₂）</li>
+                        <li>隐藏层：2 个神经元，激活函数 tanh</li>
+                        <li>输出层：1 个神经元，无激活函数</li>
+                    </ul>
+                    <p>用 micrograd 的 API 可以写成：</p>
+                    <pre><code>const model = new MGUtils.MLP(2, [2, 1], 'tanh');</code></pre>
+
+                    <p><strong>第 2 步：人工指定初始参数</strong></p>
+                    <table>
+                        <tr>
+                            <th>参数</th>
+                            <th>初始值</th>
+                            <th>说明</th>
+                        </tr>
+                        <tr>
+                            <td>隐藏神经元 1</td>
+                            <td>w₁₁=0.1, w₁₂=0.2, b₁=0.0</td>
+                            <td>接收 x₁、x₂</td>
+                        </tr>
+                        <tr>
+                            <td>隐藏神经元 2</td>
+                            <td>w₂₁=-0.1, w₂₂=0.3, b₂=0.0</td>
+                            <td>接收 x₁、x₂</td>
+                        </tr>
+                        <tr>
+                            <td>输出神经元</td>
+                            <td>v₁=0.5, v₂=-0.5, b_out=0.0</td>
+                            <td>接收 h₁、h₂</td>
+                        </tr>
+                    </table>
+
+                    <p><strong>第 3 步：前向传播</strong></p>
+                    <p>取一个训练样本：
+                        <code>x₁ = 1.0, x₂ = 0.5</code>，真实标签
+                        <code>y = 1.0</code>。
+                    </p>
+                    <pre><code>隐藏层：
+z₁ = w₁₁·x₁ + w₁₂·x₂ + b₁ = 0.1×1.0 + 0.2×0.5 + 0.0 = 0.20
+h₁ = tanh(z₁) = tanh(0.20) ≈ 0.1974
+
+z₂ = w₂₁·x₁ + w₂₂·x₂ + b₂ = -0.1×1.0 + 0.3×0.5 + 0.0 = 0.05
+h₂ = tanh(z₂) = tanh(0.05) ≈ 0.0500
+
+输出层：
+out = v₁·h₁ + v₂·h₂ + b_out = 0.5×0.1974 + (-0.5)×0.0500 + 0.0 ≈ 0.0737</code></pre>
+
+                    <p><strong>第 4 步：计算损失</strong></p>
+                    <p>用平方误差损失：</p>
+                    <pre><code>loss = (y - out)² = (1.0 - 0.0737)² ≈ 0.8580</code></pre>
+                    <p>现在目标很明确：调整 9 个参数，让 loss 变小。</p>
+
+                    <p><strong>第 5 步：反向传播（核心梯度）</strong></p>
+                    <p>调用
+                        <code>loss.backward()</code> 后，micrograd 自动算出每个参数的梯度。下面是几条关键梯度：
+                    </p>
+                    <pre><code>∂loss/∂out = 2×(out - y) ≈ -1.8526
+
+输出层：
+∂loss/∂v₁ = ∂loss/∂out × h₁ ≈ -1.8526 × 0.1974 ≈ -0.3657
+∂loss/∂v₂ = ∂loss/∂out × h₂ ≈ -1.8526 × 0.0500 ≈ -0.0926
+∂loss/∂b_out = ∂loss/∂out ≈ -1.8526
+
+隐藏层（以 w₁₁ 为例）：
+∂loss/∂h₁ = ∂loss/∂out × v₁ ≈ -1.8526 × 0.5 ≈ -0.9263
+∂h₁/∂z₁ = 1 - tanh(z₁)² ≈ 1 - 0.1974² ≈ 0.9610
+∂loss/∂w₁₁ = ∂loss/∂h₁ × ∂h₁/∂z₁ × x₁ ≈ -0.9263 × 0.9610 × 1.0 ≈ -0.8902</code></pre>
+                    <p>其余参数类似。每个梯度告诉我们：这个参数往哪个方向调、调多少能让 loss 下降。</p>
+
+                    <p><strong>第 6 步：参数更新（SGD，lr = 0.1）</strong></p>
+                    <p>更新规则：
+                        <code>参数 = 参数 - 学习率 × 梯度</code>
+                    </p>
+                    <pre><code>v₁ = 0.5 - 0.1×(-0.3657) ≈ 0.5366
+v₂ = -0.5 - 0.1×(-0.0926) ≈ -0.4907
+b_out = 0.0 - 0.1×(-1.8526) ≈ 0.1853
+
+w₁₁ = 0.1 - 0.1×(-0.8902) ≈ 0.1890
+w₁₂ = 0.2 - 0.1×(-0.4451) ≈ 0.2445
+b₁ = 0.0 - 0.1×(-0.8902) ≈ 0.0890
+
+w₂₁ = -0.1 - 0.1×0.9240 ≈ -0.1924
+w₂₂ = 0.3 - 0.1×0.4620 ≈ 0.2538
+b₂ = 0.0 - 0.1×0.9240 ≈ -0.0924</code></pre>
+
+                    <p><strong>第 7 步：预测新样本</strong></p>
+                    <p>用更新后的参数预测新样本
+                        <code>x₁ = 0.5, x₂ = 1.0</code>：
+                    </p>
+                    <pre><code>z₁ = 0.1890×0.5 + 0.2445×1.0 + 0.0890 ≈ 0.4280
+h₁ = tanh(0.4280) ≈ 0.4030
+
+z₂ = -0.1924×0.5 + 0.2538×1.0 + (-0.0924) ≈ 0.0652
+h₂ = tanh(0.0652) ≈ 0.0651
+
+out = 0.5366×0.4030 + (-0.4907)×0.0651 + 0.1853 ≈ 0.3699</code></pre>
+                    <p>训练前输出约 <strong>0.07</strong>，训练一步后预测新样本输出约 <strong>0.37</strong>，方向朝正数（标签为 1 的方向）移动。如果继续用更多样本迭代训练，输出会逐步接近真实标签。</p>
+
+                    <p><strong>完整流程回顾</strong></p>
+                    <div class="process-flow">
+                        <span class="process-step">定义 MLP</span>
+                        <span class="process-arrow">→</span>
+                        <span class="process-step">前向算输出</span>
+                        <span class="process-arrow">→</span>
+                        <span class="process-step">算损失</span>
+                        <span class="process-arrow">→</span>
+                        <span class="process-step">反向求梯度</span>
+                        <span class="process-arrow">→</span>
+                        <span class="process-step">SGD 更新</span>
+                        <span class="process-arrow">→</span>
+                        <span class="process-step">预测新样本</span>
+                    </div>
+                </div>
+
+                <h3>6.5 Moon 数据集二分类</h3>
                 <p>micrograd 的 demo.ipynb 用合成的 2D Moon 数据集训练一个二层 MLP。数据集由两个弯曲的半月形组成，需要用非线性模型才能分开。</p>
 
                 <div class="demo-container">
@@ -751,6 +1392,7 @@ MLP(nin, nouts)  → 多层 Layer，最后一层通常不用激活函数</code><
     <script src="js/quiz.js"></script>
     <script src="js/cases.js"></script>
     <script src="js/demos/network-overview.js"></script>
+    <script src="js/demos/single-neuron-trainer.js"></script>
     <script src="js/demos/computational-graph.js"></script>
     <script src="js/demos/scalar-autodiff.js"></script>
     <script src="js/demos/activation-functions.js"></script>

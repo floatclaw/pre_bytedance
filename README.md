@@ -6,11 +6,15 @@
 - **Milvus**：向量数据库学习网站
 - **Shazam**：音频指纹（Landmark 指纹）学习网站
 - **micrograd**：标量自动微分与神经网络学习网站
+- **神经网络**：神经网络原理解读文章（激活函数、卷积神经网络等）
+- **K3**：Kimi K3 大模型技术报告与相关资料
 
 > ByteCover3 核心解决「用十几秒的短视频片段，从海量歌曲中找到它的翻唱原曲」。
 > Milvus 核心解决「如何高效存储和检索高维向量，实现语义搜索」。
 > Shazam 核心解决「用一段短录音快速识别出对应的歌曲」。
 > micrograd 核心解决「从零理解自动微分、反向传播和神经网络训练」。
+> 神经网络核心解决「从生物、物理和计算视角理解神经网络为什么能自动学习特征」。
+> K3 核心提供 Moonshot Kimi K3 大模型的官方技术报告。
 
 ---
 
@@ -23,6 +27,10 @@ bytedance/
 ├── milvus_learning_site/     # Milvus 向量数据库交互式课程网站
 ├── shazam_learning_site/     # Shazam 音频指纹交互式课程网站
 ├── micrograd_learning_site/  # micrograd 自动微分与神经网络交互式课程网站
+├── 神经网络/                  # 神经网络原理解读文章
+│   ├── 激活函数/
+│   └── CNN/
+├── K3/                       # Kimi K3 技术报告
 └── BYTECOVER3- ACCURATE COVER SONG IDENTIFICATION ON SHORT QUERIES.pdf
                               # 原始论文
 ```
@@ -197,6 +205,41 @@ python3 -m http.server 8080
 
 ---
 
+### 6. `神经网络/` — 神经网络原理解读文章
+
+从神经科学、物理学和计算理论三个层面，理解神经网络为什么能自动学习特征。
+
+**内容结构：**
+- `激活函数/`
+  - `why-activation-functions.md`：为什么神经网络需要激活函数
+  - `illustrations/`：配套插图
+- `CNN/`
+  - `why-cnns-learn-features.md`：为什么卷积神经网络可以自动抓特征
+  - `why-cnns-learn-features-outline.md`：文章大纲
+  - `why-cnns-learn-features-logic.md`：逻辑链条图
+  - `illustrations/`：配套插图
+
+**阅读方式：**
+
+直接打开对应 `.md` 文件即可阅读，所有配图都在同级 `illustrations/` 目录下。
+
+---
+
+### 7. `K3/` — Kimi K3 技术报告
+
+Moonshot AI 发布的 Kimi K3 大模型官方技术报告。
+
+**内容：**
+- `k3_tech_report.pdf`：Kimi K3 技术报告原文
+
+**报告核心：**
+- KDA + AttnRes 注意力机制
+- Stable LatentMoE 专家混合架构
+- MoonViT-V2 视觉编码器
+- 后训练、评测与开源 Infra 技术
+
+---
+
 ## 学习建议
 
 1. **先看网站**：按章节顺序阅读，配合交互 Demo 理解概念。
@@ -216,7 +259,11 @@ python3 -m http.server 8080
 
 ## 离线使用
 
-本项目没有任何外部 CDN 依赖，所有 CSS、JS、图片都是本地文件。把整个目录复制到任何地方，双击 `bytecover3_site/index.html`、`milvus_learning_site/index.html`、`shazam_learning_site/index.html` 或 `micrograd_learning_site/index.html` 即可离线学习。
+本项目没有任何外部 CDN 依赖，所有 CSS、JS、图片都是本地文件。把整个目录复制到任何地方：
+
+- 双击 `bytecover3_site/index.html`、`milvus_learning_site/index.html`、`shazam_learning_site/index.html` 或 `micrograd_learning_site/index.html` 即可离线学习课程网站；
+- 直接打开 `神经网络/` 下的 `.md` 文件即可离线阅读文章；
+- `K3/k3_tech_report.pdf` 可直接用 PDF 阅读器打开。
 
 ---
 
